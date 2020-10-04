@@ -6,3 +6,5 @@ and evaluate its suitability for knowledge discovery and (ideally) attack detect
 ---
 
 Get familiar with the following repo: https://github.com/CN-TU/py_pcap2transcription
+
+Flow extractor: https://github.com/CN-TU/go-flows
