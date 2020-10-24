@@ -1,4 +1,4 @@
-from csv_output import writer, QUOTE_ALL
+from csv import writer, QUOTE_ALL
 from sys import stdout, stdin
 
 from python.feature_extraction.arguments import MyArgumentsParser
