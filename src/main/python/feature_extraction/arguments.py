@@ -1,6 +1,4 @@
 from argparse import ArgumentParser
-from csv import writer, QUOTE_ALL
-from sys import stdin, stdout
 
 
 class MyArgumentsParser:
@@ -23,7 +21,3 @@ class FeaturesArgument:
         parser.add_argument("--features", type=str, required=True, nargs='+',
                             help="List of features.")
         return parser
-
-# Argument handling
-
-# set up csv output and write header
