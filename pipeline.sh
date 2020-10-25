@@ -9,4 +9,9 @@ tshark -n -l -r test.pcap -T pdml | python3 src/main/python/feature_extraction/m
 
 # 2. Extracting flows as conversation transcriptions
 echo "Extracting flows as conversation transcriptions"
-#perl symboltran_lt.pl test.csv > test_tr.txt
+python3 src/main/python/transcription/main.py --filename test.csv > test_tr.txt
+
+
+#tshark -n -l -r test.pcap -T pdml | \
+#  python3 src/main/python/feature_extraction/main.py --features timestamp ip.proto ip.src ip.dst tcp.flags tcp.len | \
+#  python3 src/main/python/transcription/main.py test.csv > test_tr.txt
