@@ -2,6 +2,8 @@ import csv
 from math import floor
 
 from python.transcription.arguments import MyArgumentsParser
+from python.transcription.keys import KeysGenerator
+from python.transcription.symbol_generator import CommunicationGapsGenerator, TcpLenSymbolGenerator
 
 
 class StreamEntry:
@@ -25,21 +27,6 @@ class StreamEntry:
         self.tcp_len = tcp_len
 
 
-def generate_communication_gaps(entry, stream_last_time):
-    time_diff = entry.timestamp - stream_last_time
-    time_diff_tens_ms = floor(time_diff/0.1)
-    gaps = []
-    for tens_ms_inc in range(time_diff_tens_ms):
-        gaps.append("-")
-    return gaps
-
-
-def generate_output_symbol(entry):
-    symbol = int(entry.tcp_len / 146)
-    return symbol
-
-
-
 
 if __name__ == '__main__':
 
@@ -57,27 +44,18 @@ if __name__ == '__main__':
             # print(', '.join(row))
             if entry.ip_protocol != 6:
                 continue
-            hosts_pair_key = None
-            hosts_pair = entry.ip_source + "-" + entry.ip_dest
-            hosts_pair_inverse = entry.ip_dest + "-" + entry.ip_source
-
             if min_time is None:
                 min_time = entry.timestamp
 
             current_time = floor(float(entry.timestamp)) - min_time
 
-            if hosts_pair not in streams.keys() and hosts_pair_inverse not in streams.keys():
-                hosts_pair_key = hosts_pair
-                streams[hosts_pair_key] = []
-                streams_last_timestamps[hosts_pair_key] = entry.timestamp
+            key = KeysGenerator.generate_key(streams, entry)
+            if key not in streams.keys():
+                streams[key] = []
+                streams_last_timestamps[key] = entry.timestamp
 
-            if hosts_pair in streams.keys():
-                hosts_pair_key = hosts_pair
-            if hosts_pair in streams.keys():
-                hosts_pair_key = hosts_pair_inverse
+            comm_gaps = CommunicationGapsGenerator.generate(entry, streams_last_timestamps[key])
+            symbol = TcpLenSymbolGenerator.generate(entry)
 
-            comm_gaps = generate_communication_gaps(entry, streams_last_timestamps[hosts_pair_key])
-            symbol = generate_output_symbol(entry)
-
-            streams[hosts_pair_key].append(comm_gaps)
-            streams[hosts_pair_key].append(symbol)
+            streams[key].append(comm_gaps)
+            streams[key].append(symbol)
