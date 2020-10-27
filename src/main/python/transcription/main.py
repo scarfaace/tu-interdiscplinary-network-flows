@@ -3,6 +3,7 @@ from math import floor
 
 from python.transcription.arguments import MyArgumentsParser
 from python.transcription.keys import KeysGenerator
+from python.transcription.output import OutputPrinter
 from python.transcription.symbol_generator import CommunicationGapsGenerator, TcpLenSymbolGenerator
 
 
@@ -59,3 +60,5 @@ if __name__ == '__main__':
 
             streams[key].append(comm_gaps)
             streams[key].append(symbol)
+
+    OutputPrinter.print(streams)
