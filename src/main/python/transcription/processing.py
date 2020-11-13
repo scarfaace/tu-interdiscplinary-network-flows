@@ -4,7 +4,7 @@ from math import floor
 from python.transcription.symbol_generator import CommunicationGapsGenerator, TcpLenSymbolGenerator
 
 
-class StreamEntry:
+class TcpPacket:
     def __init__(self, timestamp, ip_protocol, ip_source, ip_dest, tcp_flags, tcp_len):
         self.timestamp = timestamp
         self.ip_protocol = ip_protocol
@@ -15,7 +15,7 @@ class StreamEntry:
 
     @classmethod
     def build_from_row(cls, row):
-        return StreamEntry(
+        return TcpPacket(
             timestamp=float(row[0]),
             ip_protocol=int(row[1]),
             ip_source=row[2],
@@ -56,14 +56,14 @@ class InputFileProcessor:
     def process(self, input_file_name):
         with open(input_file_name, newline='') as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+            next(csv_reader)        # skip header
             for row in csv_reader:
-                entry = StreamEntry.build_from_row(row)
-                # print(', '.join(row))
-                if entry.ip_protocol != 6:
+                if not self.is_row_tcp_packet(row):
                     continue
-                if min_time is None:
-                    min_time = entry.timestamp
-
+                entry = TcpPacket.build_from_row(row)
+                # print(', '.join(row))
+                if self.min_time is None:
+                    self.min_time = entry.timestamp
 
                 key = KeysGenerator.generate_key(self.streams, entry)
                 if key not in self.streams.keys():
@@ -73,9 +73,13 @@ class InputFileProcessor:
                 self.generate_output_symbols(entry, key)
 
                 self.streams_last_timestamps[key] = floor(float(entry.timestamp))
+        return self.streams
+
+    def is_row_tcp_packet(self, row):
+        return int(row[1]) == 6
 
     def generate_output_symbols(self, entry, key):
         comm_gaps = CommunicationGapsGenerator.generate(entry, self.streams_last_timestamps[key])
         symbol = TcpLenSymbolGenerator.generate(entry)
-        self.streams[key].append(comm_gaps)
+        self.streams[key].extend(comm_gaps)
         self.streams[key].append(symbol)

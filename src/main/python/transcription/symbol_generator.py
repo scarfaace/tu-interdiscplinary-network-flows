@@ -18,4 +18,4 @@ class TcpLenSymbolGenerator:
     @staticmethod
     def generate(entry):
         symbol = int(entry.tcp_len / 146)
-        return symbol
+        return str(symbol)

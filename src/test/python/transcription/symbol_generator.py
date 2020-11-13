@@ -1,13 +1,13 @@
 import unittest
 
-from python.transcription.processing import StreamEntry
+from python.transcription.processing import TcpPacket
 from python.transcription.symbol_generator import CommunicationGapsGenerator
 
 
 class CommunicationGapsGeneratorTest(unittest.TestCase):
 
     def test_GIVEN_streamEntryAndStreamOccurrenceOfPreviousEntry_WHEN_calledGenerate_THEN_correctNumberOfDashesGenerated(self):
-        entry = StreamEntry(
+        entry = TcpPacket(
             timestamp=100.1,
             ip_protocol=6,
             ip_source="1.1.1.1",
