@@ -72,7 +72,7 @@ class InputFileProcessor:
                 communication_direction = CommunicationDirectionDecider.decide_communication_direction(key, entry)
                 self.__generate_output_symbols(entry, key, communication_direction)
 
-                self.streams_last_timestamps[key] = floor(float(entry.timestamp))
+                self.streams_last_timestamps[key] = float(entry.timestamp)
         return self.streams
 
 
