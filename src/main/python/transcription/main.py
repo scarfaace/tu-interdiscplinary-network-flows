@@ -7,6 +7,7 @@ if __name__ == '__main__':
     my_arguments_parser = MyArgumentsParser()
     arguments = my_arguments_parser.parse_arguments()
 
-    processed_streams = InputFileProcessor.process(arguments.filename)
+    inputFileProcessor = InputFileProcessor()
+    processed_streams = inputFileProcessor.process(arguments.filename)
 
     OutputPrinter.print(processed_streams)

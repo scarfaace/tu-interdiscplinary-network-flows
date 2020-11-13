@@ -1,7 +1,6 @@
 import csv
 from math import floor
 
-from python.transcription.keys import KeysGenerator
 from python.transcription.symbol_generator import CommunicationGapsGenerator, TcpLenSymbolGenerator
 
 
@@ -26,15 +25,35 @@ class StreamEntry:
         )
 
 
+class KeysGenerator:
+    @classmethod
+    def generate_key(cls, streams, entry):
+        hosts_pair, hosts_pair_inverse = cls.generate_possible_keys(entry)
+        if hosts_pair not in streams.keys() and hosts_pair_inverse not in streams.keys():
+            return hosts_pair
+        if hosts_pair in streams.keys():
+            return hosts_pair
+        if hosts_pair_inverse in streams.keys():
+            return hosts_pair_inverse
+
+    @classmethod
+    def generate_possible_keys(cls, entry):
+        hosts_pair = entry.ip_source + "-" + entry.ip_dest
+        hosts_pair_inverse = entry.ip_dest + "-" + entry.ip_source
+        return hosts_pair, hosts_pair_inverse
+
+
+
 
 class InputFileProcessor:
 
-    @classmethod
-    def process(cls, input_file_name):
-        streams = {}
-        streams_last_timestamps = {}
-        min_time = None
+    def __init__(self):
+        self.streams = {}
+        self.streams_last_timestamps = {}
+        self.min_time = None
 
+
+    def process(self, input_file_name):
         with open(input_file_name, newline='') as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
             for row in csv_reader:
@@ -46,15 +65,17 @@ class InputFileProcessor:
                     min_time = entry.timestamp
 
 
-                key = KeysGenerator.generate_key(streams, entry)
-                if key not in streams.keys():
-                    streams[key] = []
-                    streams_last_timestamps[key] = entry.timestamp
+                key = KeysGenerator.generate_key(self.streams, entry)
+                if key not in self.streams.keys():
+                    self.streams[key] = []
+                    self.streams_last_timestamps[key] = entry.timestamp
 
-                comm_gaps = CommunicationGapsGenerator.generate(entry, streams_last_timestamps[key])
-                symbol = TcpLenSymbolGenerator.generate(entry)
+                self.generate_output_symbols(entry, key)
 
-                streams_last_timestamps[key] = floor(float(entry.timestamp))
+                self.streams_last_timestamps[key] = floor(float(entry.timestamp))
 
-                streams[key].append(comm_gaps)
-                streams[key].append(symbol)
+    def generate_output_symbols(self, entry, key):
+        comm_gaps = CommunicationGapsGenerator.generate(entry, self.streams_last_timestamps[key])
+        symbol = TcpLenSymbolGenerator.generate(entry)
+        self.streams[key].append(comm_gaps)
+        self.streams[key].append(symbol)
