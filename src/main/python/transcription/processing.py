@@ -58,10 +58,9 @@ class InputFileProcessor:
             csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
             next(csv_reader)        # skip header
             for row in csv_reader:
-                if not self.is_row_tcp_packet(row):
+                if not self.__is_row_tcp_packet(row):
                     continue
                 entry = TcpPacket.build_from_row(row)
-                # print(', '.join(row))
                 if self.min_time is None:
                     self.min_time = entry.timestamp
 
@@ -70,16 +69,37 @@ class InputFileProcessor:
                     self.streams[key] = []
                     self.streams_last_timestamps[key] = entry.timestamp
 
-                self.generate_output_symbols(entry, key)
+                communication_direction = CommunicationDirectionDecider.decide_communication_direction(key, entry)
+                self.__generate_output_symbols(entry, key, communication_direction)
 
                 self.streams_last_timestamps[key] = floor(float(entry.timestamp))
         return self.streams
 
-    def is_row_tcp_packet(self, row):
+
+    def __is_row_tcp_packet(self, row):
         return int(row[1]) == 6
 
-    def generate_output_symbols(self, entry, key):
+
+    def __generate_output_symbols(self, entry, key, communication_direction):
         comm_gaps = CommunicationGapsGenerator.generate(entry, self.streams_last_timestamps[key])
-        symbol = TcpLenSymbolGenerator.generate(entry)
+        symbol = TcpLenSymbolGenerator.generate(entry, communication_direction)
         self.streams[key].extend(comm_gaps)
         self.streams[key].append(symbol)
+
+
+
+class CommunicationDirectionDecider:
+    @classmethod
+    def decide_communication_direction(cls, key, entry):
+        ip_left, ip_right = cls.__split_key_to_ip_addresses(key)
+        if entry.ip_source == ip_left:
+            return 65
+        if entry.ip_source == ip_right:
+            return 97
+
+    @classmethod
+    def __split_key_to_ip_addresses(cls, key):
+        split = key.split('-')
+        ip_left = split[0]
+        ip_right = split[1]
+        return ip_left, ip_right
