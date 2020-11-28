@@ -25,7 +25,7 @@ class FeatureExtractor:
                         pkt[elem.attrib['name']] = elem.attrib['show']
                     elem.clear()
                     continue
-            # detect end of packet and write output
+            # detect end of packet and write out
             if elem.tag == 'packet' and event == 'end':
                 if pkt['ip.src'] and pkt['ip.dst']:
                     self.csv_output.writerow([pkt[feature] for feature in self.features])
