@@ -1,7 +1,6 @@
 import csv
-from math import floor
 
-from python.transcription.symbol_generator import CommunicationGapsGenerator, TcpLenSymbolGenerator
+from transcription.symbol_generator import CommunicationGapsGenerator, TcpLenSymbolGenerator
 
 
 class TcpPacket:

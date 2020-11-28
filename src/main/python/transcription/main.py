@@ -1,6 +1,6 @@
-from python.transcription.arguments import MyArgumentsParser
-from python.transcription.output import OutputPrinter
-from python.transcription.processing import InputFileProcessor
+from transcription.arguments import MyArgumentsParser
+from transcription.output import OutputPrinter
+from transcription.processing import InputFileProcessor
 
 if __name__ == '__main__':
 

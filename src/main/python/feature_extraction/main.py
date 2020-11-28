@@ -1,8 +1,8 @@
 from csv import writer, QUOTE_ALL
 from sys import stdout, stdin
 
-from python.feature_extraction.arguments import MyArgumentsParser
-from python.feature_extraction.feature_extractor import FeatureExtractor
+from feature_extraction.arguments import MyArgumentsParser
+from feature_extraction.feature_extractor import FeatureExtractor
 
 if __name__ == '__main__':
     # get packets record features from .pcap by tshark (pyshark)
