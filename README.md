@@ -11,6 +11,10 @@ Flow extractor: https://github.com/CN-TU/go-flows
 
 ---
 
+1-page project outline: https://www.overleaf.com/project/5fb786ec59a7beec1c00b0a2
+
+--
+
 ## Run Manual Tests
 
 In `src/main/test/resources/test1.csv` there is a small testing file which represents output from the feature extraction
