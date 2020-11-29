@@ -43,7 +43,7 @@ class LabelsFileArgument(AbstractArgument):
 
     def add_argument_to_parser(self, parser):
         parser.add_argument(
-            "--filename",
+            self.argument,
             type=str,
             required=False,
             help="The name of the csv file containing labels information about network data."

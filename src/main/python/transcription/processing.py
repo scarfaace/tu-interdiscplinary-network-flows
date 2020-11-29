@@ -1,5 +1,6 @@
 import csv
 
+from transcription.flows.KeyGenerator import TcpPacketEntryKeyGenerator
 from transcription.symbol_generator import CommunicationGapsGenerator, TcpLenSymbolGenerator
 
 
@@ -24,22 +25,7 @@ class TcpPacket:
         )
 
 
-class KeysGenerator:
-    @classmethod
-    def generate_key(cls, streams, entry):
-        hosts_pair, hosts_pair_inverse = cls.generate_possible_keys(entry)
-        if hosts_pair not in streams.keys() and hosts_pair_inverse not in streams.keys():
-            return hosts_pair
-        if hosts_pair in streams.keys():
-            return hosts_pair
-        if hosts_pair_inverse in streams.keys():
-            return hosts_pair_inverse
 
-    @classmethod
-    def generate_possible_keys(cls, entry):
-        hosts_pair = entry.ip_source + "-" + entry.ip_dest
-        hosts_pair_inverse = entry.ip_dest + "-" + entry.ip_source
-        return hosts_pair, hosts_pair_inverse
 
 
 
@@ -63,7 +49,7 @@ class InputFileProcessor:
                 if self.min_time is None:
                     self.min_time = entry.timestamp
 
-                key = KeysGenerator.generate_key(self.streams, entry)
+                key = TcpPacketEntryKeyGenerator.generate_key(self.streams, entry)
                 if key not in self.streams.keys():
                     self.streams[key] = []
                     self.streams_last_timestamps[key] = entry.timestamp
@@ -89,7 +75,7 @@ class InputFileProcessor:
 
 class CommunicationDirectionDecider:
     @classmethod
-    def decide_communication_direction(cls, key, entry):
+    def decide_communication_direction(cls, key, entry) -> int:
         ip_left, ip_right = cls.__split_key_to_ip_addresses(key)
         if entry.ip_source == ip_left:
             return 65
@@ -97,8 +83,9 @@ class CommunicationDirectionDecider:
             return 97
 
     @classmethod
-    def __split_key_to_ip_addresses(cls, key):
+    def __split_key_to_ip_addresses(cls, key) -> tuple:
         split = key.split('-')
         ip_left = split[0]
         ip_right = split[1]
         return ip_left, ip_right
+
