@@ -18,5 +18,5 @@ if __name__ == '__main__':
         loaded_labels = labelsFileLoader.load(arguments.labels_filename)
         labelsOutputPrinter.print(loaded_labels, processed_streams)
     else:
-        BasicOutputPrinter.print(processed_streams)
+        baseOutputPrinter.print(processed_streams)
 

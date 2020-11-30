@@ -11,11 +11,11 @@ class BasicOutputPrinter:
         print(self.header)
         for hosts_pair_key in streams:
             # symbols_stream = ''.join(streams[hosts_pair_key])
-            symbols_stream = self.__create_symbols_stream(streams[hosts_pair_key])
+            symbols_stream = self.__join_symbols_stream(streams[hosts_pair_key])
             output_line = '{},{}'.format(hosts_pair_key, symbols_stream)
             print(output_line)
 
-    def __create_symbols_stream(self, symbols_arr):
+    def __join_symbols_stream(self, symbols_arr) -> str:
         return ''.join(symbols_arr)
 
 
@@ -30,12 +30,12 @@ class LabelsOutputPrinter:
             ip1, ip2 = self.__split_ip_key(hosts_pair_key)
             label = self.__find_ip_pair_in_labels(labels, ip1, ip2)
             # symbols_stream = ''.join(streams[hosts_pair_key])
-            symbols_stream = self.__create_symbols_stream(streams[hosts_pair_key])
+            symbols_stream = self.__join_symbols_stream(streams[hosts_pair_key])
             output_line = '{},{},{},{},{}'.format(ip1, ip2, label.label, label.attack, symbols_stream)
             print(output_line)
 
 
-    def __create_symbols_stream(self, symbols_arr):
+    def __join_symbols_stream(self, symbols_arr) -> str:
         return ''.join(symbols_arr)
 
     def __find_ip_pair_in_labels(self, labels, ip1, ip2) -> LabelObject:
@@ -44,8 +44,10 @@ class LabelsOutputPrinter:
         key2 = key_format.format(ip2, ip1)
         if key1 in labels:
             return labels[key1]
-        else:
+        if key2 in labels:
             return labels[key2]
+        else:
+            return LabelObject(None, None)
 
 
     def __split_ip_key(self, ip_key: str):
