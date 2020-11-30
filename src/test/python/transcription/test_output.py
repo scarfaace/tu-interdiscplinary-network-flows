@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, call
 
-from transcription.output import BaseOutputPrinter
+from transcription.output import BasicOutputPrinter
 
 
 class OutputPrinterTest(unittest.TestCase):
@@ -12,7 +12,7 @@ class OutputPrinterTest(unittest.TestCase):
             '1.1.1.1 - 2.2.2.2': "AAA---ab---Cd"
         }
 
-        BaseOutputPrinter.print(streams)
+        BasicOutputPrinter.print(streams)
 
         mock_print.assert_called_with('1.1.1.1 - 2.2.2.2: AAA---ab---Cd')
 
@@ -24,7 +24,7 @@ class OutputPrinterTest(unittest.TestCase):
             '2.2.2.2 - 3.3.3.3': 'aa--bb--CC'
         }
 
-        BaseOutputPrinter.print(streams)
+        BasicOutputPrinter.print(streams)
 
         assert mocked_print.mock_calls == [
             call('0.0.0.0 - 1.1.1.1: AAA---ab---Cd'),
