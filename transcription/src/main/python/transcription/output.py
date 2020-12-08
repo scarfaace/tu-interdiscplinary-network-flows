@@ -1,3 +1,4 @@
+from transcription.TmpStreamReader import TmpStreamReader
 from transcription.labels.processing import LabelObject
 
 
@@ -10,13 +11,9 @@ class BasicOutputPrinter:
     def print(self, streams):
         print(self.header)
         for hosts_pair_key in streams:
-            # symbols_stream = ''.join(streams[hosts_pair_key])
-            symbols_stream = self.__join_symbols_stream(streams[hosts_pair_key])
+            symbols_stream = TmpStreamReader.read_stream_from_file(hosts_pair_key)
             output_line = '{},{}'.format(hosts_pair_key, symbols_stream)
             print(output_line)
-
-    def __join_symbols_stream(self, symbols_arr) -> str:
-        return ''.join(symbols_arr)
 
 
 
@@ -29,14 +26,10 @@ class LabelsOutputPrinter:
         for hosts_pair_key in streams:
             ip1, ip2 = self.__split_ip_key(hosts_pair_key)
             label = self.__find_ip_pair_in_labels(labels, ip1, ip2)
-            # symbols_stream = ''.join(streams[hosts_pair_key])
-            symbols_stream = self.__join_symbols_stream(streams[hosts_pair_key])
+            symbols_stream = TmpStreamReader.read_stream_from_file(hosts_pair_key)
             output_line = '{},{},{},{},{}'.format(ip1, ip2, label.label, label.attack, symbols_stream)
             print(output_line)
 
-
-    def __join_symbols_stream(self, symbols_arr) -> str:
-        return ''.join(symbols_arr)
 
     def __find_ip_pair_in_labels(self, labels, ip1, ip2) -> LabelObject:
         key_format = '{}-{}'

@@ -1,6 +1,7 @@
 import csv
 
 from transcription.flows.KeyGenerator import TcpPacketEntryKeyGenerator
+from transcription.StreamFlusher import StreamFlusher
 from transcription.symbol_generator import CommunicationGapsGenerator, TcpLenSymbolGenerator
 
 
@@ -38,6 +39,7 @@ class InputFileProcessor:
 
     def process(self, input_file_name):
         with open(input_file_name, newline='') as csvfile:
+            iterator = 0
             csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
             next(csv_reader)        # skip header
             for row in csv_reader:
@@ -56,6 +58,14 @@ class InputFileProcessor:
                 self.__generate_output_symbols(entry, key, communication_direction)
 
                 self.streams_last_timestamps[key] = float(entry.timestamp)
+
+                iterator += 1
+                if iterator == 100000:
+                    iterator = 0
+                    StreamFlusher.flush(self.streams)
+                    for key in self.streams:
+                        self.streams[key].clear()
+
         return self.streams
 
 

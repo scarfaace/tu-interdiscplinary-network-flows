@@ -1,7 +1,15 @@
+import shutil
+
 from transcription.arguments import MyArgumentsParser
+from transcription.constants import TMP_STREAMS_FOLDER
 from transcription.labels.processing import LabelsFileLoader
 from transcription.output import BasicOutputPrinter, LabelsOutputPrinter
 from transcription.processing import InputFileProcessor
+
+
+def clean_tmp_streams():
+    shutil.rmtree(TMP_STREAMS_FOLDER)
+
 
 if __name__ == '__main__':
     my_arguments_parser = MyArgumentsParser()
@@ -20,3 +28,4 @@ if __name__ == '__main__':
     else:
         baseOutputPrinter.print(processed_streams)
 
+    # clean_tmp_streams()
