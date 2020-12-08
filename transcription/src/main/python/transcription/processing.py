@@ -62,11 +62,16 @@ class InputFileProcessor:
                 iterator += 1
                 if iterator == 100000:
                     iterator = 0
-                    StreamFlusher.flush(self.streams)
-                    for key in self.streams:
-                        self.streams[key].clear()
+                    self.__flush()
 
+            self.__flush()
         return self.streams
+
+
+    def __flush(self):
+        StreamFlusher.flush(self.streams)
+        for key in self.streams:
+            self.streams[key].clear()
 
 
     def __is_row_tcp_packet(self, row):
