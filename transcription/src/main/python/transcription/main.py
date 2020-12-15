@@ -28,4 +28,4 @@ if __name__ == '__main__':
     else:
         baseOutputPrinter.print(processed_streams)
 
-    # clean_tmp_streams()
+    clean_tmp_streams()
