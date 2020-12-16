@@ -11,7 +11,10 @@ from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
 #%% Load the dataset
-df = pd.read_csv("model/data/transcription_Tuesday.csv", sep=',')
+df = pd.read_csv("model/data/tuesday_sampled.csv", sep=',')
+
+#%%
+df['transcription'] = np.array([list(x) for x in df['transcription']])
 
 #%% Split the dataset into train/test
 train, test = train_test_split(df[['transcription', 'label']], train_size=0.7, random_state=123)
@@ -24,16 +27,9 @@ X_test_raw = test['transcription']
 Y_train = train['label']
 Y_test = test['label']
 
-#%%
-X_train = []
-for input_sequence in X_train_raw:
-    onehot = tf.keras.preprocessing.text.one_hot(input_sequence, 547)
-    X_train.append(onehot)
-
-X_test = []
-for input_sequence in X_test_raw:
-    onehot = tf.keras.preprocessing.text.one_hot(input_sequence, 547)
-    X_test.append(onehot)
+#%% Cast the sequence to integers
+X_train = X_train_raw.apply(lambda x: [ord(i) for i in x])
+X_test = X_test_raw.apply(lambda x: [ord(i) for i in x])
 
 #%%
 X_padded = sequence.pad_sequences(X_train, maxlen=750, dtype='object', value=0, padding='post')
@@ -60,6 +56,10 @@ print(modelClass.summary())
 modelClass.fit(X_padded, Y_train, epochs=3, batch_size=64)
 
 #%% Predict
+predictions = modelClass.predict(X_test_padded)
+confusion = tf.math.confusion_matrix(labels=Y_test, predictions=predictions, num_classes=2)
+
+#%% Evaluate
 scores = modelClass.evaluate(X_test_padded, Y_test, verbose=0)
 print("Accuracy: %.2f%%" % (scores[1]*100))
 
