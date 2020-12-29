@@ -9,9 +9,11 @@ from keras.preprocessing import sequence
 np.random.seed(7)
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+from sklearn.preprocessing import normalize
+
 
 #%% Load the dataset
-df = pd.read_csv("model/data/tuesday_sampled.csv", sep=',')
+df = pd.read_csv("model/data/10percent_attacks.csv", sep=',')
 
 #%%
 df['transcription'] = np.array([list(x) for x in df['transcription']])
@@ -38,10 +40,12 @@ X_test_padded = sequence.pad_sequences(X_test, maxlen=750, dtype='object', value
 
 #%%
 X_padded = np.asarray(X_padded).astype('float32')
+X_padded_normalized = normalize(X_padded)
 Y_train = np.asarray(Y_train).astype('float32')
 
 #%%
 X_test_padded = np.asarray(X_test_padded).astype('float32')
+X_test_padded_normalized = normalize(X_test_padded)
 Y_test = np.asarray(Y_test).astype('float32')
 
 #%%
@@ -53,14 +57,14 @@ modelClass.add(Dense(1, activation='sigmoid'))
 modelClass.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(modelClass.summary())
 #%% Train
-modelClass.fit(X_padded, Y_train, epochs=3, batch_size=64)
+modelClass.fit(X_padded_normalized, Y_train, epochs=3, batch_size=64)
 
 #%% Predict
-predictions = modelClass.predict(X_test_padded)
+predictions = modelClass.predict(X_test_padded_normalized)
 confusion = tf.math.confusion_matrix(labels=Y_test, predictions=predictions, num_classes=2)
 
 #%% Evaluate
-scores = modelClass.evaluate(X_test_padded, Y_test, verbose=0)
+scores = modelClass.evaluate(X_test_padded_normalized, Y_test, verbose=0)
 print("Accuracy: %.2f%%" % (scores[1]*100))
 
 
