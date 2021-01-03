@@ -44,10 +44,25 @@ states the following:
 - the minimum size of an IP packet is 21 bytes (20 bytes for header and 1 byte of data),
 - the maximum size of an IP packet is 65 535 bytes
 
-Based on this information, we can provide a new transcription scheme. The printable characters in ASCII start with 
+Based on this information, we can provide a new transcription scheme. The printable characters in ASCII start with
 the character `!` (with decimal code 33) and ends at the character `~` (with decimal code 126).
 
 Therefore, we can use the character `!` as a character denoting 10ms pause in a communication and other characters
 can be used for denoting lengths of IP (or TCP) packets. We may try out a technique that will not longer distinguish
 between the communication directions (it is not even properly working now). Therefore, the direction if the packet
 will not longer be anyhow distinguished.
+
+
+
+
+---
+
+## Releases
+
+### v0.0.1
+- just ASCII characters ranging from the character `!` (dec code 33) to the character `~` (dec code 126),
+- `!` is used as character for representing 10ms gap,
+- therefore 93 characters are available for encoding packet length,
+    - we use 70 of them for encoding length <= 16 384
+    - and remaining 23 for encoding length > 16 384
+- no communication direction distinction
