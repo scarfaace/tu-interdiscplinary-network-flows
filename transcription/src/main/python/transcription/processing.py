@@ -54,8 +54,7 @@ class InputFileProcessor:
                     self.streams[key] = []
                     self.streams_last_timestamps[key] = entry.timestamp
 
-                communication_direction = CommunicationDirectionDecider.decide_communication_direction(key, entry)
-                self.__generate_output_symbols(entry, key, communication_direction)
+                self.__generate_output_symbols(entry, key)
 
                 self.streams_last_timestamps[key] = float(entry.timestamp)
 
@@ -78,9 +77,9 @@ class InputFileProcessor:
         return int(row[1]) == 6
 
 
-    def __generate_output_symbols(self, entry, key, communication_direction):
+    def __generate_output_symbols(self, entry, key):
         comm_gaps = CommunicationGapsGenerator.generate(entry, self.streams_last_timestamps[key])
-        symbol = TcpLenSymbolGenerator.generate(entry, communication_direction)
+        symbol = TcpLenSymbolGenerator.generate(entry)
         self.streams[key].extend(comm_gaps)
         self.streams[key].append(symbol)
 
