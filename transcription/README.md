@@ -32,3 +32,22 @@ Mind that the `export` of `PYTHONPATH` is very important to be able to include t
 ---
 
 go-flows uses IANA features - https://www.iana.org/assignments/ipfix/ipfix.xml
+
+
+
+---
+
+## IP Packet Size
+
+[O'Reilly](https://www.oreilly.com/library/view/internet-core-protocols/1565925726/re04.html#:~:text=The%20minimum%20size%20of%20an,maximum%20size%20is%2065%2C535%20bytes.&text=In%20the%20capture%20shown%20in,is%20set%20to%2060%20bytes.)
+states the following:
+- the minimum size of an IP packet is 21 bytes (20 bytes for header and 1 byte of data),
+- the maximum size of an IP packet is 65 535 bytes
+
+Based on this information, we can provide a new transcription scheme. The printable characters in ASCII start with 
+the character `!` (with decimal code 33) and ends at the character `~` (with decimal code 126).
+
+Therefore, we can use the character `!` as a character denoting 10ms pause in a communication and other characters
+can be used for denoting lengths of IP (or TCP) packets. We may try out a technique that will not longer distinguish
+between the communication directions (it is not even properly working now). Therefore, the direction if the packet
+will not longer be anyhow distinguished.
