@@ -64,5 +64,5 @@ will not longer be anyhow distinguished.
 - `!` is used as character for representing 10ms gap,
 - therefore 93 characters are available for encoding packet length,
   - we use 70 of them for encoding length <= 16 384
-  - and remaining 23 for encoding length > 16 384
+  - and remaining 23 for encoding length > 16 384 ... <= 65 5XX
 - no communication direction distinction
