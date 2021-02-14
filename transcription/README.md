@@ -59,9 +59,10 @@ will not longer be anyhow distinguished.
 
 ## Releases
 
-### v0.0.1
+### transcription/v0.0.1
 - just ASCII characters ranging from the character `!` (dec code 33) to the character `~` (dec code 126),
 - `!` is used as character for representing 10ms gap,
+- saving files as TSV instead of CSV because the transcriptions contain comma character
 - therefore 93 characters are available for encoding packet length,
   - we use 70 of them for encoding length <= 16 384
   - and remaining 23 for encoding length > 16 384 ... <= 65 5XX
