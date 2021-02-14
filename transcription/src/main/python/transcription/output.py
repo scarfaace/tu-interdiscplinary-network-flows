@@ -6,20 +6,20 @@ from transcription.labels.processing import LabelObject
 
 class BasicOutputPrinter:
     def __init__(self):
-        self.header = 'ipPair,transcription'
+        self.header = 'ipPair\ttranscription'
 
     def print(self, streams):
         print(self.header)
         for hosts_pair_key in streams:
             symbols_stream = TmpStreamReader.read_stream_from_file(hosts_pair_key)
-            output_line = '{},{}'.format(hosts_pair_key, symbols_stream)
+            output_line = '{}\t{}'.format(hosts_pair_key, symbols_stream)
             print(output_line)
 
 
 
 class LabelsOutputPrinter:
     def __init__(self):
-        self.header = 'srcIP,dstIP,label,attack,transcription'
+        self.header = 'srcIP\tdstIP\tlabel\tattack\ttranscription'
 
     def print(self, labels, streams):
         print(self.header)
@@ -27,7 +27,7 @@ class LabelsOutputPrinter:
             ip1, ip2 = self.__split_ip_key(hosts_pair_key)
             label = self.__find_ip_pair_in_labels(labels, ip1, ip2)
             symbols_stream = TmpStreamReader.read_stream_from_file(hosts_pair_key)
-            output_line = '{},{},{},{},{}'.format(ip1, ip2, label.label, label.attack, symbols_stream)
+            output_line = '{}\t{}\t{}\t{}\t{}'.format(ip1, ip2, label.label, label.attack, symbols_stream)
             print(output_line)
 
 
