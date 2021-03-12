@@ -20,7 +20,8 @@ class CommunicationGapsGenerator:
 
 class TcpLenSymbolGenerator:
     @staticmethod
-    def generate(entry, communication_direction):
+    def generate(entry, key):
+        communication_direction = CommunicationDirectionDecider.decide_communication_direction(key, entry)
         if entry.tcp_len <= 2**14:   # 16 384
             symbol_offset = int(entry.tcp_len / 547)     # 16384 / 547 = 29,95
             symbol_number = communication_direction + symbol_offset
@@ -31,3 +32,20 @@ class TcpLenSymbolGenerator:
         else:
             symbol_number = communication_direction + 45    # use 46th character
         return chr(symbol_number)
+
+
+class CommunicationDirectionDecider:
+    @classmethod
+    def decide_communication_direction(cls, key, entry) -> int:
+        ip_left, ip_right = cls.__split_key_to_ip_addresses(key)
+        if entry.ip_source == ip_left:
+            return 34   # start at '"'
+        if entry.ip_source == ip_right:
+            return 80   # start at 'P'
+
+    @classmethod
+    def __split_key_to_ip_addresses(cls, key) -> tuple:
+        split = key.split('-')
+        ip_left = split[0]
+        ip_right = split[1]
+        return ip_left, ip_right
