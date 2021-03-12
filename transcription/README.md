@@ -62,7 +62,19 @@ will not longer be anyhow distinguished.
 ### v0.0.1
 - just ASCII characters ranging from the character `!` (dec code 33) to the character `~` (dec code 126),
 - `!` is used as character for representing 10ms gap,
-- therefore 93 characters are available for encoding packet length,
+- therefore 94 characters are available for encoding packet length,
     - we use 70 of them for encoding length <= 16 384
     - and remaining 23 for encoding length > 16 384
 - no communication direction distinction
+
+
+### v1.0.0
+- just ASCII characters ranging from the character `!` (dec code 33) to the character `~` (dec code 125),
+- `!` is used as character for representing 10ms gap,
+- therefore 92 characters are available for encoding packet length,
+  - chars from position 34 to 125 (46 + 46) for deciding **communication direction**
+- we use 46 of them for encoding the ip packet length for one direction
+- and the remaining 46 to encode the other direction
+- for each direction we use first 30 to encode length <= 16 384
+- 15 characters for encoding length (16 384, 65 536] 
+- and the last remaining character is used for packets bigger than 65 536
