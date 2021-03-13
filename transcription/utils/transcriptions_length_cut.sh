@@ -2,6 +2,7 @@ transcription_length="${1:-250000}"
 echo "Cutting at ${transcription_length}th character."
 
 base_file_name="Wednesday_transcription"
+#base_file_name="Wednesday_attacks"
 input_transcription_file_path="../out/""$base_file_name"".csv"
 output_file_path="../out/""$base_file_name""_cut.csv"
 
