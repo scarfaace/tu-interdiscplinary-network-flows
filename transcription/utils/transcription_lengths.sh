@@ -1,5 +1,6 @@
-input_transcription_file_path="../out/Wednesday_attacks.csv"
-output_file_path="../out/Wednesday_attacks_lengths.csv"
+base_file_name="Wednesday_transcription"
+input_transcription_file_path="../out/""$base_file_name"".csv"
+output_file_path="../out/""$base_file_name""_lengths.csv"
 
 awk -F '\t' '{
   if(NR==1) {
