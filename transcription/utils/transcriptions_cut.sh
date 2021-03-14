@@ -1,7 +1,7 @@
 transcription_length="${1:-250000}"
 echo "Cutting at ${transcription_length}th character."
 
-base_file_name="Friday_transcription"
+base_file_name="non-attacks_merged"
 #base_file_name="Wednesday_attacks"
 input_transcription_file_path="../out/""$base_file_name"".tsv"
 output_file_path="../out/""$base_file_name""_cut.tsv"

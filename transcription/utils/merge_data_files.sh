@@ -1,8 +1,8 @@
 base_file_names=( "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" )
-file_name_postfix="_attacks"
-output_file_path="../out/attacks_merged.tsv"
-#file_name_postfix="_non-attacks_subsample"
-#output_file_path="../out/non-attacks_merged.tsv"
+#file_name_postfix="_attacks"
+#output_file_path="../out/attacks_merged.tsv"
+file_name_postfix="_non-attacks_subsample"
+output_file_path="../out/non-attacks_merged.tsv"
 
 for base_file_name in "${base_file_names[@]}"
 do
