@@ -2,7 +2,7 @@
 # Add source roots to PYTHONPATH
 export PYTHONPATH=`pwd`/src/main/python/
 
-base_file_name="Tuesday"
+base_file_name="Friday"
 pcap_file_path="resources/CIC-IDS-2017/${base_file_name}-WorkingHours.pcap"
 feature_extraction_output_file_path="out/${base_file_name}_features.csv"
 out_transcription_file_path="out/${base_file_name}_transcription.tsv"
