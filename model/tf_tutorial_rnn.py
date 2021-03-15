@@ -4,16 +4,18 @@ import pandas as pd
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
+from keras.layers import Dropout
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
 np.random.seed(7)
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+from tensorflow.keras.layers.experimental import preprocessing
 from sklearn.preprocessing import normalize
 
 
 #%% Load the dataset
-df = pd.read_csv("model/data/10percent_attacks.csv", sep=',')
+df = pd.read_csv("model/data/wednesday_all.csv", sep='\t')
 
 #%%
 df['transcription'] = np.array([list(x) for x in df['transcription']])
@@ -37,6 +39,9 @@ X_test = X_test_raw.apply(lambda x: [ord(i) for i in x])
 X_padded = sequence.pad_sequences(X_train, maxlen=750, dtype='object', value=0, padding='post')
 X_test_padded = sequence.pad_sequences(X_test, maxlen=750, dtype='object', value=0, padding='post')
 
+#%%
+normalizer = preprocessing.Normalization()
+normalizer.adapt(X_padded)
 
 #%%
 X_padded = np.asarray(X_padded).astype('float32')
@@ -52,7 +57,9 @@ Y_test = np.asarray(Y_test).astype('float32')
 emb_vecor_length = 547
 modelClass = Sequential()
 modelClass.add(Embedding(547, emb_vecor_length, input_length=750))
+modelClass.add(Dropout(0.2))
 modelClass.add(LSTM(100))
+modelClass.add(Dropout(0.2))
 modelClass.add(Dense(1, activation='sigmoid'))
 modelClass.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(modelClass.summary())
