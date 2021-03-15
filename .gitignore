@@ -1,4 +1,4 @@
 .idea/
 **/__pycache__/
 **/.pytest_cache
-/model/data/old/transcription_Tuesday.csv
+/model/data/old_v1/transcription_Tuesday.csv
