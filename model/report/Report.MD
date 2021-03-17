@@ -235,3 +235,37 @@ CF:
 
 Change to binary_crossentropy
 
+Network: tf.keras.Sequential([
+        tf.keras.layers.Embedding(
+            input_dim=input_dimension,
+            output_dim=128),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.LSTM(128, dropout=0.2, recurrent_dropout=0.2),
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(1, activation='sigmoid')
+
+Learning rate: 0.001
+tf.Tensor(
+[[409 720]
+ [ 24  66]], shape=(2, 2), dtype=int32)
+39/39 [==============================] - 4s 103ms/step - loss: 0.7297 - accuracy: 0.3864
+Learning rate: 0.0007500025
+tf.Tensor(
+[[405 724]
+ [ 24  66]], shape=(2, 2), dtype=int32)
+39/39 [==============================] - 4s 103ms/step - loss: 0.7242 - accuracy: 0.3856
+Learning rate: 0.000500005
+tf.Tensor(
+[[404 725]
+ [ 24  66]], shape=(2, 2), dtype=int32)
+39/39 [==============================] - 4s 105ms/step - loss: 0.7229 - accuracy: 0.3552
+Learning rate: 0.00025000749999999996
+tf.Tensor(
+[[366 763]
+ [ 23  67]], shape=(2, 2), dtype=int32)
+39/39 [==============================] - 4s 102ms/step - loss: 0.6989 - accuracy: 0.0804
+Learning rate: 1e-08
+tf.Tensor(
+[[   8 1121]
+ [   0   90]], shape=(2, 2), dtype=int32)
