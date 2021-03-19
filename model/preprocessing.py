@@ -4,20 +4,25 @@ import pandas as pd
 np.random.seed(7)
 
 #%% Load the attack dataset
-df = pd.read_csv("model/data/Wednesday_attacks.csv", sep='\t')
-df_non_attack = pd.read_csv("model/data/wednesday_sampled_nonattacks.csv", sep='\t')
-#%%
-df_total = df.append(df_non_attack)
-#%%
-df_total = df_total.sample(frac=1)
+df_non_attack = pd.read_csv("model/data/data-cut/non-attacks_merged_cut.tsv", sep='\t')
+df_attack = pd.read_csv("model/data/data-cut/attacks_merged_cut.tsv", sep='\t')
 
 #%%
-df_total.to_csv("model/data/wednesday_all.csv", sep='\t', encoding='utf8')
+df_non_attack_sample = df_non_attack.sample(frac=0.1)
+
+#%%
+df_total = df_attack.append(df_non_attack_sample)
+
+#%%
+df_shuffled = df_total.sample(frac=1)
+
+#%%
+df_total.to_csv("model/data/10percent_cut.tsv", sep='\t', encoding='utf8')
 
 #%% Filter the attacks and non-attacks to separate dataframes
 df_ones = df[df.label == 1]
 df_zeros = df[df.label == 0]
-df_zeros_sampled = df_zeros.sample(n=2475, random_state=123)
+df_zeros_sampled = df_zeros.sample(frac=0.07, random_state=123)
 
 #%%
 df_appended = df_ones.append(df_zeros_sampled)
@@ -26,7 +31,7 @@ df_appended = df_ones.append(df_zeros_sampled)
 df_shuffled = df_appended.sample(frac=1)
 
 #%% Save to CSV
-df_shuffled.to_csv("model/data/tuesday_sampled.csv", sep=',', encoding='utf8')
+df_shuffled.to_csv("model/data/Wednesday_transcription_sampled_7percent.csv", sep='\t', encoding='utf8')
 
 #%% Load all "attacks" datasets
 df_monday = pd.read_csv("model/data/Monday_attacks.csv", sep=',')

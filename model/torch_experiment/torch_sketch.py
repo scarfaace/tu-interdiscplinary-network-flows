@@ -7,9 +7,6 @@ import random
 #%% Load data
 df = pd.read_csv("model/data/wednesday_all.csv", sep='\t')
 
-#%% Create list of chars from transcription
-# tokenized_transcription = np.array([list(x) for x in df['transcription']])
-
 #%%
 def unicode_to_ascii(s):
     return ''.join(
@@ -70,49 +67,66 @@ def random_training_example(category_lines, all_categories):
     line = random_choice(category_lines[category])
     category_tensor = torch.tensor([all_categories.index(category)], dtype=torch.long)
     line_tensor = line_to_tensor(line)
+    line_tensor_shape = line_tensor.shape
+    line_tensor = torch.reshape(line_tensor, (1, 1, line_tensor_shape[0], line_tensor_shape[2]))
+    print("Line tensor shape: " + str(line_tensor.shape))
     return category, line, category_tensor, line_tensor
 
 #%%
 import torch
 import torch.nn as nn
 
+
 class RNN(nn.Module):
-    # implement RNN from scratch rather than using nn.RNN
-    def __init__(self, input_size, hidden_size, output_size):
+    def __init__(self, input_size, hidden_size, num_layers, num_classes):
         super(RNN, self).__init__()
-
+        self.num_layers = num_layers
         self.hidden_size = hidden_size
-        self.i2h = nn.Linear(input_size + hidden_size, hidden_size)
-        self.i2o = nn.Linear(input_size + hidden_size, output_size)
-        self.softmax = nn.LogSoftmax(dim=1)
+        self.rnn = nn.RNN(input_size, hidden_size, num_layers)
+        # -> x needs to be: (batch_size, seq, input_size)
 
-    def forward(self, input_tensor, hidden_tensor):
-        combined = torch.cat((input_tensor, hidden_tensor), 1)
+        # or:
+        # self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
+        # self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_size, num_classes)
 
-        hidden = self.i2h(combined)
-        output = self.i2o(combined)
-        output = self.softmax(output)
-        return output, hidden
+    def forward(self, x):
+        # Set initial hidden states (and cell states for LSTM)
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)#.to(device)
+        # c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)#.to(device)
 
-    def init_hidden(self):
-        return torch.zeros(1, self.hidden_size)
+        # x: (n, 28, 28), h0: (2, n, 128)
 
+        # Forward propagate RNN
+        out, _ = self.rnn(x, h0)
+        # or:
+        # out, _ = self.lstm(x, (h0, c0))
+
+        # out: tensor of shape (batch_size, seq_length, hidden_size)
+        # out: (n, 28, 128)
+
+        # Decode the hidden state of the last time step
+        out = out[:, -1, :]
+        # out: (n, 128)
+
+        out = self.fc(out)
+        # out: (n, 10)
+        return out
 #%%
 n_categories = 2
 n_hidden = 128
-rnn = RNN(N_LETTERS, n_hidden, n_categories)
+num_layers = 2
+rnn = RNN(N_LETTERS, n_hidden, num_layers, n_categories)
 
 #%%
 input_tensor = letter_to_tensor('@')
-hidden_tensor = rnn.init_hidden()
-
-output, next_hidden = rnn(input_tensor, hidden_tensor)
+input_tensor = input_tensor.unsqueeze(dim=0)
+output = rnn(input_tensor)
 
 #%%
 input_tensor = line_to_tensor('BaAaaBaaBaAa--------------aCaaAaaaAAAa')
-hidden_tensor = rnn.init_hidden()
-
-output, next_hidden = rnn(input_tensor[0], hidden_tensor)
+input_tensor = input_tensor.unsqueeze(dim=0)
+output = rnn(input_tensor[0])
 
 #%%
 def category_from_output(output):
@@ -128,10 +142,9 @@ optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
 
 #%%
 def train(line_tensor, category_tensor):
-    hidden = rnn.init_hidden()
 
     for i in range(line_tensor.size()[0]):
-        output, hidden = rnn(line_tensor[i], hidden)
+        output = rnn(line_tensor[i])
 
     loss = criterion(output, category_tensor)
 
