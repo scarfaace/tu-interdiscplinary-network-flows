@@ -18,3 +18,8 @@ echo "Feature extraction finished"
 echo "Extracting flows as conversation transcriptions"
 python3 src/main/python/transcription/main.py --filename "$feature_extraction_output_file_path" --labels-filename resources/CIC-IDS-2017/labels_CAIA_17.csv > "$out_transcription_file_path"
 echo "Finished creating text-like transcriptions of network flows."
+
+
+echo "Deleting tmp files..."
+rm "$feature_extraction_output_file_path"
+echo "Finished"

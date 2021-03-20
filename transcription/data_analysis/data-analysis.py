@@ -16,10 +16,12 @@ featuresLengths = featuresDf.ipTotalLength
 transcriptionsLengths = transcriptionsDf.transcription
 
 #%%
+# CDF for transcription lengths for Wednesday attacks, all Wednesday transcriptions
 attacksLengths.hist(cumulative=True, density=1, bins=100)
 plt.show()
 transcriptionsLengths.hist(cumulative=True, density=1, bins=100)
 plt.show()
+# CDF for packet lengths of Wednesday communications
 featuresLengths.hist(cumulative=True, density=1, bins=100)
 plt.show()
 
