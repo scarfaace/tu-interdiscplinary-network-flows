@@ -53,9 +53,8 @@ between the communication directions (it is not even properly working now). Ther
 will not longer be anyhow distinguished.
 
 
-
-
 ---
+
 
 ## Releases
 
@@ -78,3 +77,11 @@ will not longer be anyhow distinguished.
 - for each direction we use first 30 to encode length <= 16 384
 - 15 characters for encoding length (16 384, 65 536] 
 - and the last remaining character is used for packets bigger than 65 536
+
+---
+
+## TODO
+
+- make visualizations for the packet size in time for each flow
+- make a model for a numeric vector (e.g. AGM) so that I can compare it with the bag of words model
+
