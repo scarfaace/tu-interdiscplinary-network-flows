@@ -13,16 +13,29 @@ transcriptionsDf = pandas.read_csv("transcription/data_analysis/Wednesday_transc
 #%%
 attacksLengths = attacksDf.transcription
 featuresLengths = featuresDf.ipTotalLength
+featuresLengths = featuresLengths.rename('Packet Length')
 transcriptionsLengths = transcriptionsDf.transcription
 
+
 #%%
-# CDF for transcription lengths for Wednesday attacks, all Wednesday transcriptions
+# CDF for transcription lengths for Wednesday attacks
 attacksLengths.hist(cumulative=True, density=1, bins=100)
+plt.title('CDF for transcription lengths for Wednesday attacks')
+plt.xlabel('Transcription Length (in characters)')
+plt.ylabel('Probability')
 plt.show()
+
+# CDF for transcription lengths for all Wednesday transcriptions
 transcriptionsLengths.hist(cumulative=True, density=1, bins=100)
+plt.title('CDF for transcription lengths for all Wednesday transcriptions')
+plt.xlabel('Transcription Length (in characters)')
+plt.ylabel('Probability')
 plt.show()
+
 # CDF for packet lengths of Wednesday communications
 featuresLengths.hist(cumulative=True, density=1, bins=100)
+plt.xlabel('Packet Length (in bytes)')
+plt.ylabel('Probability')
 plt.show()
 
 #%%
