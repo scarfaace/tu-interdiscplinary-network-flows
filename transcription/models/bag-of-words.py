@@ -59,9 +59,9 @@ X_test_words = vectorizer.transform(X_test.values.astype('U'))
 
 
 #%%
-# Logistic Regression CV
-cv_scores = cross_val_score(LogisticRegression(), X_train_words, y_train)
-print("Mean CV accuracy: {:.2f}".format(np.mean(cv_scores)))
+# # Logistic Regression CV
+# cv_scores = cross_val_score(LogisticRegression(), X_train_words, y_train)
+# print("Mean CV accuracy: {:.2f}".format(np.mean(cv_scores)))
 
 
 #%%
