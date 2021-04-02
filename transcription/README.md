@@ -85,3 +85,21 @@ will not longer be anyhow distinguished.
 - make visualizations for the packet size in time for each flow
 - make a model for a numeric vector (e.g. AGM) so that I can compare it with the bag of words model
 
+---
+
+## Available Scripts
+
+### pipeline.sh
+- the script `pipeline.sh` creates NTFT out of the specified pcap file
+- note, that right now the `pipeline.sh` script is tailored for processing CIC2017 IDS data as well as
+  labeling them (attacks/non-attack)
+- how to run:
+  - extract `transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv.gz` into `transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv`
+  - download any pcap day data from http://205.174.165.80/CICDataset/CIC-IDS-2017/Dataset/PCAPs/ and save it into 
+    the folder `transcription/resources/CIC-IDS-2017` with its original name (e.g. `Monday-WorkingHours.pcap`)
+  - navigate to the `transcription` folder in the root directory 
+  - run `pipeline.sh` with the 1st parameter the name of the day that you downloaded
+  - examples: 
+    - `./pipeline.sh Monday`
+    - `./pipeline.sh Tuesday`
+  - after the run is finished, you can find your output files in `transcription/out/`
