@@ -59,7 +59,7 @@ class InputFileProcessor:
                     self.streams_first_timestamps[key] = float(entry.timestamp)
                     self.streams_last_timestamps[key] = float(entry.timestamp)
 
-                if self.__is_flow_timed_out(key):
+                if self.__is_flow_timed_out(key, entry.timestamp):
                     continue
 
                 self.__generate_output_symbols(entry, key)
@@ -67,7 +67,7 @@ class InputFileProcessor:
                 self.streams_last_timestamps[key] = float(entry.timestamp)
 
                 iterator += 1
-                if iterator == 100000:
+                if iterator == 500000:
                     iterator = 0
                     self.__flush()
 
@@ -91,8 +91,8 @@ class InputFileProcessor:
         self.streams[key].extend(communication_gaps)
         self.streams[key].append(symbol)
 
-    def __is_flow_timed_out(self, key: str):
-        first_and_last_timestamp_diff_ms = self.streams_last_timestamps[key] - self.streams_first_timestamps[key]
+    def __is_flow_timed_out(self, key: str, packetTimestamp: float):
+        first_and_last_timestamp_diff_ms = packetTimestamp - self.streams_first_timestamps[key]
         first_and_last_timestamp_diff_seconds = first_and_last_timestamp_diff_ms / 1000
         if first_and_last_timestamp_diff_seconds >= self.ACTIVE_TIMEOUT_SECONDS:
             return True
