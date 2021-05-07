@@ -7,12 +7,11 @@ class CommunicationGapsGenerator:
         self.gap_symbol = '!'
 
     def generate(self, entry, stream_last_time):
-        time_diff = Decimal(str(entry.timestamp)) - Decimal(str(stream_last_time))
-        time_diff_ms = time_diff * 1000
+        time_diff_ms = Decimal(str(entry.timestamp)) - Decimal(str(stream_last_time))
         # print('time_diff: {}'.format(time_diff_ms), file=sys.stderr)
-        time_diff_tens_ms = floor(time_diff_ms/10)
+        time_diff_seconds = floor(time_diff_ms/1000)
         gaps = []
-        for tens_ms_inc in range(time_diff_tens_ms):
+        for tens_ms_inc in range(time_diff_seconds):
             gaps.append(self.gap_symbol)
         # print('time_diff: {}\ntime_diff_ms: {}\ntime_diff_10s_ms: {}\ngaps: {}'.format(time_diff, time_diff_ms, time_diff_tens_ms, len(gaps)), file=sys.stderr)
         return gaps

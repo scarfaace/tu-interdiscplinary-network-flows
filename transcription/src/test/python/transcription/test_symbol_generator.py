@@ -1,15 +1,15 @@
 import unittest
 
-from transcription.processing import TcpPacket
+from transcription.processing import Packet
 from transcription.symbol_generator import CommunicationGapsGenerator
 
 
 class CommunicationGapsGeneratorTest(unittest.TestCase):
 
     def test_GIVEN_streamEntryAndStreamOccurrenceOfPreviousEntry_WHEN_calledGenerate_THEN_correctNumberOfDashesGenerated(self):
-        entry = TcpPacket(
+        entry = Packet(
             timestamp=100.1,
-            ip_protocol=6,
+            protocol_identifier=6,
             ip_source="1.1.1.1",
             ip_dest="2.2.2.2",
             tcp_len=20

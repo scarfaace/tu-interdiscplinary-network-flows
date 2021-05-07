@@ -8,8 +8,7 @@ Attached an example of a "config.json" file that extracts features according to 
 
 - "flows": [{...}]
   
-
-  This is the features that you want to extract from your flows. There are infinite possibilities and combinations, but you can find many basic features and their description here: https://www.iana.org/assignments/ipfix/ipfix.xhtml
+This is the features that you want to extract from your flows. There are infinite possibilities and combinations, but you can find many basic features and their description here: https://www.iana.org/assignments/ipfix/ipfix.xhtml
 
 - "active_timeout": ...,
 
@@ -24,7 +23,8 @@ This is the maximum time that you allow a flow to be passive (no communication)
 If your flows are defined in one direction (A->B) or in both directions (A<->B)
 
 - "key_features": [...]
-  This is the flow definition, kinda mask. It can be 2-tuple, 4-tuple, 5-tuple, or whatever you like. If, for example, you define a 2-tuple key ("sourceIPAddress", "destinationIPAddress"), everything (I mean: packets) that shows the same values in these two fields will be considered belonging to the same flow (also within the scope covered by the active and idle timeouts).
+
+This is the flow definition, kinda mask. It can be 2-tuple, 4-tuple, 5-tuple, or whatever you like. If, for example, you define a 2-tuple key ("sourceIPAddress", "destinationIPAddress"), everything (I mean: packets) that shows the same values in these two fields will be considered belonging to the same flow (also within the scope covered by the active and idle timeouts).
 
 
 > One more thing - I thought that it may be a reasonable choice to compare the performance of the model above the NTFT data with the multi-key vector data from this paper. Does that make sense in your opinion? I see that you focused on encrypted communication there and did some research around this multi-key vector.

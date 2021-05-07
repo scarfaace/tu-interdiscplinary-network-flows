@@ -3,16 +3,18 @@
 export PYTHONPATH=`pwd`/src/main/python/
 
 
-base_file_name="${1:-Friday}"
+base_file_name="${1:-Tuesday}"
 pcap_file_path="resources/CIC-IDS-2017/${base_file_name}-WorkingHours.pcap"
 feature_extraction_output_file_path="out/${base_file_name}_features.csv"
 out_transcription_file_path="out/${base_file_name}_transcription.tsv"
+feature_extraction_config_path="feature_extraction/pcap2pkts.json"
+#feature_extraction_config_path="feature_extraction/2tuple_bidi_100s.json"
 
 echo "Processing file ${pcap_file_path}"
 
 # 1. Extracting features from pcap in a tabular format (csv)
 echo "Extracting features from pcap into a tabular format (csv)"
-go-flows run features feature_extraction/pcap2pkts.json export csv "$feature_extraction_output_file_path" source libpcap "$pcap_file_path"
+go-flows run features "$feature_extraction_config_path" export csv "$feature_extraction_output_file_path" source libpcap "$pcap_file_path"
 echo "Feature extraction finished"
 
 
@@ -23,6 +25,6 @@ echo "Finished creating text-like transcriptions of network flows."
 
 echo "NTFT saved into ${out_transcription_file_path}"
 
-echo "Deleting tmp files..."
-rm "$feature_extraction_output_file_path"
-echo "Finished"
+#echo "Deleting tmp files..."
+#rm "$feature_extraction_output_file_path"
+#echo "Finished"
