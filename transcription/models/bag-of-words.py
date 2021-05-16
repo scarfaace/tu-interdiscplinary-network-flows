@@ -10,26 +10,26 @@ from sklearn.model_selection import train_test_split
 
 #%%
 # Read data
-attacksMergedDf = pd.read_csv("transcription/out/attacks_merged_cut.tsv", sep='\t')
-nonAttacksMergedDf = pd.read_csv("transcription/out/non-attacks_merged_cut.tsv", sep='\t')
-nonAttacksMergedDf = nonAttacksMergedDf.sample(n=5000, random_state=123)
+mergedAllDf = pd.read_csv("transcription/out/merged_all.tsv", sep='\t', quoting=3)
+nonAttacksDf = mergedAllDf[mergedAllDf.label == 0].sample(n=1200, random_state=123)
+attacksDf = mergedAllDf[mergedAllDf.label == 1]
 
-attacksMergedDf = attacksMergedDf[['label', 'transcription']]
-nonAttacksMergedDf = nonAttacksMergedDf[['label', 'transcription']]
+nonAttacksDf = nonAttacksDf[['label', 'transcription']]
+attacksDf = attacksDf[['label', 'transcription']]
 
 
 #%%
 # Samples per class
-commonDf = pd.concat([attacksMergedDf, nonAttacksMergedDf])
+commonDf = pd.concat([nonAttacksDf, attacksDf])
 print("Samples per class: {}".format(np.bincount(commonDf['label'])))
 
 
 #%%
 # Create train and test data
 X_train_attacks, X_test_attacks, y_train_attacks, y_test_attacks = \
-    train_test_split(attacksMergedDf, attacksMergedDf.label, test_size=0.2)
+    train_test_split(attacksDf, attacksDf.label, test_size=0.2, random_state=123)
 X_train_nonAttacks, X_test_nonAttacks, y_train_nonAttacks, y_test_nonAttacks = \
-    train_test_split(nonAttacksMergedDf, nonAttacksMergedDf.label, test_size=0.2)
+    train_test_split(nonAttacksDf, nonAttacksDf.label, test_size=0.2, random_state=123)
 
 X_train = pd.concat([X_train_attacks, X_train_nonAttacks])['transcription']
 X_test = pd.concat([X_test_attacks, X_test_nonAttacks])['transcription']
