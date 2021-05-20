@@ -66,7 +66,7 @@ X_test_words = vectorizer.transform(X_test.values.astype('U'))
 
 #%%
 # model = LogisticRegression()
-model = RandomForestClassifier()
+model = RandomForestClassifier(random_state=20)
 model.fit(X_train_words, y_train)
 print("Train set score: {:.3f}".format(model.score(X_train_words, y_train)))
 print("Test set score:  {:.3f}".format(model.score(X_test_words, y_test)))
