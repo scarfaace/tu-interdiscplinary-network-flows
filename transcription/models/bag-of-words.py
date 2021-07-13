@@ -1,22 +1,22 @@
 #%%
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, plot_confusion_matrix
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
 
 #%%
 # Read data
-mergedAllDf = pd.read_csv("transcription/out/merged_all.tsv", sep='\t', quoting=3)
-nonAttacksDf = mergedAllDf[mergedAllDf.label == 0].sample(n=1200, random_state=123)
+mergedAllDf = pd.read_csv("../out/merged_all.tsv", sep='\t', quoting=3)
+nonAttacksDf = mergedAllDf[mergedAllDf.label == 0].sample(n=2000, random_state=123)
 attacksDf = mergedAllDf[mergedAllDf.label == 1]
 
 nonAttacksDf = nonAttacksDf[['label', 'transcription']]
 attacksDf = attacksDf[['label', 'transcription']]
-
 
 #%%
 # Samples per class
@@ -66,13 +66,30 @@ X_test_words = vectorizer.transform(X_test.values.astype('U'))
 
 #%%
 # model = LogisticRegression()
+sample_weight = np.array([8 if i == 1 else 1 for i in y_train])
 model = RandomForestClassifier(random_state=20)
-model.fit(X_train_words, y_train)
+model.fit(X_train_words, y_train, sample_weight=sample_weight)
 print("Train set score: {:.3f}".format(model.score(X_train_words, y_train)))
 print("Test set score:  {:.3f}".format(model.score(X_test_words, y_test)))
 
 
 #%%
-predictions = model.predict(X_test_words)
-confusion_matrix = confusion_matrix(y_test, predictions)
-print("Confusion matrix:\n{}".format(confusion_matrix))
+# predictions = model.predict(X_test_words)
+# confusion_matrix = confusion_matrix(y_test, predictions)
+# print("Confusion matrix:\n{}".format(confusion_matrix))
+
+
+#%%
+# https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+titles_options = [("Confusion matrix, without normalization", None, '.0f'),
+                  ("Normalized confusion matrix", 'true', '.3f')]
+for title, normalize, values_format in titles_options:
+    disp = plot_confusion_matrix(model, X_test_words, y_test,
+                                 cmap=plt.cm.Blues,
+                                 normalize=normalize,
+                                 values_format=values_format)
+    disp.ax_.set_title(title)
+
+    print(title)
+    print(disp.confusion_matrix)
+    plt.show()

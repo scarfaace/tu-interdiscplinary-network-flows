@@ -27,8 +27,11 @@ echo "Finished creating text-like transcriptions of network flows."
 echo `date`
 echo
 
-echo "NTFT saved into ${out_transcription_file_path}"
 
-#echo "Deleting tmp files..."
-#rm "$feature_extraction_output_file_path"
-#echo "Finished"
+echo "NTFT saved into ${out_transcription_file_path}"
+echo
+
+
+echo "Deleting tmp files..."
+rm "$feature_extraction_output_file_path"
+echo "Finished"
