@@ -1,0 +1,57 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{TCP/IP communication flows into sentence-like transcriptions}
+\author{Allan Kálnay}
+\date{\today}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+
+\begin{document}
+
+\maketitle
+
+\section*{Abstract}
+The goal of this work was to design a suitable schema that transforms TCP/IP flows files to sentence-like transcriptions and implement a software in Python that does such transformation from \textit{pcap} files. The schema that we implemented uses printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) which makes 93 characters altogether. Our schema utilizes four communication features to express the final transcription -- packet size, communication gaps (communication silence), communication direction, elapsed time since the beginning of the communication. With a specific configuration that we used for these four features, we were able to to convert huge pcap files (circa 10GB) into few kB big files. At the same time we were able to produce quite decent results for a classification problem distinguishing between attack and non-attack flows. For this purpose we used Random Forest Classifier on top of bag of words.
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Background}
+\subsection{pcap2transcription}
+
+\section{Methodology}
+\subsection{Data}
+% describe what data set I was working with (CIC2017 IDS dataset (synthetic labeled)
+
+\subsection{Initial Findings}
+% describe what I found in data -- show the charts from the 1st and 2nd report for Felix, describe these findings and later
+
+\subsection{Schema}
+% descrieb the schema definition. Describe what characters we use, describe how we distinguish between the flow directions, describe the binning
+
+\subsection{Implementation}
+% describe the software itself, the scripts for data processing, what language I used
+
+\section{Conclusions}
+
+
+
+
+% \bibliographystyle{plain}
+% \bibliography{references}
+
+% \begin{thebibliography}{}
+
+% \bibitem{tshark-documentation} Wireshark.org. 2020. \textit{Tshark - The Wireshark Network Analyzer 3.4.0}. [online] Available at: \url{https://www.wireshark.org/docs/man-pages/tshark.html} [Accessed 28 November 2020].
+
+% \bibitem{python-popularity} Piatetsky, G., 2020. \textit{Python Leads The 11 Top Data Science, Machine Learning Platforms: Trends And Analysis - Kdnuggets}. [online] KDnuggets. Available at: \url{https://www.kdnuggets.com/2019/05/poll-top-data-science-machine-learning-platforms.html} [Accessed 28 November 2020].
+
+% \end{thebibliography}
+
+\end{document}
+
