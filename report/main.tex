@@ -27,12 +27,28 @@ The goal of this work was to design a suitable schema that transforms TCP/IP flo
 \section{Methodology}
 \subsection{Data}
 % describe what data set I was working with (CIC2017 IDS dataset (synthetic labeled)
+For the purpose of our experiments we used the CIC IDS 2017 dataset \cite{cic-ids-dataset}. The dataset contains pcap files and labels of the network flows. The labels are binary -- attack and non-attack.
 
-\subsection{Initial Findings}
+%-------------------------------------------------------
+\subsection{Dataset Research}\label{sec-dataset-research}
 % describe what I found in data -- show the charts from the 1st and 2nd report for Felix, describe these findings and later
+Since the beginning we decided to work with four network flow features -- packet size, communication gaps (communication silence), communication direction, elapsed time since the beginning of the communication. Based on this decision we researched our dataset to find out more about these features and to drive our decisions later based on this research.
 
+
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
 \subsection{Schema}
 % descrieb the schema definition. Describe what characters we use, describe how we distinguish between the flow directions, describe the binning
+The output of our data processing pipeline is a tsv file with four columns -- Source IP, Destination IP, Attack, Transcription. The IP addresses represent the communication endpoints. The Attack attribute contains a binary information whether the network flow is a attack or not. The Transcription attribute contains the transcription itself. 
+
+The transcription is a string of characters describing a network flow. We use 93 characters to describe flows by transcriptions. These are printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) where each character represents a captured packet size. Each character represents different packet sizes. The characters are ordered in the same chronological order as the packet captures.
+
+The very first character, exclamation mark, is used to represent a silence in a communication. One such character represents a silence of 1 second. The 46 characters starting from the quotation mark included up to the \textit{O} character included are used to describe one direction of a communication. The 46 characters starting from the \textit{P} character included up to the tilde character included are used to describe the other direction of a communication.
+
+Based on the research in the section \ref{sec-dataset-research} we utilized the characters in such way that the characters represent different bins of packet size. POPISAT BINNING
+%-------------------------------------------------------
 
 \subsection{Implementation}
 % describe the software itself, the scripts for data processing, what language I used
@@ -42,16 +58,16 @@ The goal of this work was to design a suitable schema that transforms TCP/IP flo
 
 
 
-% \bibliographystyle{plain}
-% \bibliography{references}
+\bibliographystyle{plain}
 
-% \begin{thebibliography}{}
+\begin{thebibliography}{}
 
-% \bibitem{tshark-documentation} Wireshark.org. 2020. \textit{Tshark - The Wireshark Network Analyzer 3.4.0}. [online] Available at: \url{https://www.wireshark.org/docs/man-pages/tshark.html} [Accessed 28 November 2020].
+\bibitem{tshark-documentation} Wireshark.org. 2020. \textit{Tshark - The Wireshark Network Analyzer 3.4.0}. [online] Available at: \url{https://www.wireshark.org/docs/man-pages/tshark.html} [Accessed 28 November 2020].
 
-% \bibitem{python-popularity} Piatetsky, G., 2020. \textit{Python Leads The 11 Top Data Science, Machine Learning Platforms: Trends And Analysis - Kdnuggets}. [online] KDnuggets. Available at: \url{https://www.kdnuggets.com/2019/05/poll-top-data-science-machine-learning-platforms.html} [Accessed 28 November 2020].
+\bibitem{python-popularity} Piatetsky, G., 2020. \textit{Python Leads The 11 Top Data Science, Machine Learning Platforms: Trends And Analysis - Kdnuggets}. [online] KDnuggets. Available at: \url{https://www.kdnuggets.com/2019/05/poll-top-data-science-machine-learning-platforms.html} [Accessed 28 November 2020].
 
-% \end{thebibliography}
+\bibitem{cic-ids-dataset} Iman Sharafaldin, Arash Habibi Lashkari, and Ali A. Ghorbani, “Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization”, 4th International Conference on Information Systems Security and Privacy (ICISSP), Portugal, January 2018
+
+\end{thebibliography}
 
 \end{document}
-
