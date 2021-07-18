@@ -34,7 +34,8 @@ plt.show()
 
 # CDF for packet lengths of Wednesday communications
 featuresLengths.hist(cumulative=True, density=1, bins=100)
-plt.xlabel('Packet Length (in bytes)')
+plt.title('CDF for packet sizes for all Wednesday transcriptions')
+plt.xlabel('Packet Size (in bytes)')
 plt.ylabel('Probability')
 plt.show()
 
