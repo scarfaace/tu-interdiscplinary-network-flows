@@ -30,6 +30,10 @@
 % describe what data set I was working with (CIC2017 IDS dataset (synthetic labeled)
     For the purpose of our experiments we used the synthetic CIC IDS 2017 dataset \cite{sharafaldin2018toward}. The dataset contains pcap files and labels of the network flows. The labels are binary -- attack and non-attack.
 
+    There are 5 different pcap files in this data set. Each of them represent a different day in the week from Monday to Friday. The size of all of them vary from 7GB up to 12GB. These files are packet captures.
+
+% describe how many packets do the files contain
+
 %-------------------------------------------------------
     \subsection{Data Exploration}\label{sec-dataset-exploration}
 % describe what I found in data -- show the charts from the 1st and 2nd report for Felix, describe these findings and later
@@ -63,6 +67,13 @@
 
 %-------------------------------------------------------
 
+    \subsection{Output Data Set}
+
+    The output data set built from pcap files is a TSV file. The basic file structure is \textit{srcIP, dstIP, transcription}. The advanced file structure which contains also labels for network flows contains \textit{label} and \textit{attack} alongside the 3 mentioned attributes. An end-user will receive file of the basic structure if no file containing labels is specified. If such file is specified, the program tries to look up a label for each flow and assign a label and a type of attack to each entry of the output data set.
+
+%-------------------------------------------------------
+
+
     \subsection{Implementation}
 % describe the software itself, the scripts for data processing, what language I used
 
@@ -81,6 +92,40 @@
 
 
     \subsection{Testing}
+    For the testing purposes I decided to train Random Forest on top of bag of words. The goal was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of the whole test set is meaningless for us as our data set is imbalanced and therefore overall accuracy may distort results.
+
+    We used a very simple bag of words technique. For each entry of the data set (a transcription) we counted number of each word in a particular transcription. Basically, we transformed our data set of transcriptions to the data set where our dimensions represented the word counts in transcriptions. For better understanding, see an example at figure \ref{fig-bag-of-words-example}.
+
+    \begin{figure}[h!]
+        \centering
+        \begin{tabular}{ |c|c|c|c| }
+            \hline
+            srcIP & dstIP & attack & transcription \\
+            \hline
+            1.1.1.1 & 2.2.2.2 & 1 & AAp!D!p \\
+            2.2.2.2 & 3.3.3.3 & 0 & P!PD \\
+            \hline
+        \end{tabular}
+
+        \vspace{0.3cm}
+
+        \begin{tabular}{ |c|c|c|c|c|c|c| }
+            \hline
+            srcIP & dstIP & A & D & P & p & ! \\
+            \hline
+            1.1.1.1 & 2.2.2.2 & 2 & 1 & 0 & 2 & 1 \\
+            2.2.2.2 & 3.3.3.3 & 0 & 1 & 2 & 0 & 1 \\
+            \hline
+        \end{tabular}
+        \caption{Data set of transcriptions (on top) and bag of words data set (bottom)}
+        \label{fig-bag-of-words-example}
+    \end{figure}
+
+    We trained a Random Forest model on top of the bag of words data set. As our data set was imbalanced -- approximately 10:2 ratio of non-attacks to attacks -- we considered this during the Random Forest model training. To put a higher to attacks so that we simulate the balance of the classes.
+
+% describe the results that I got (the confusion matrix, accuracy etc). Next describe how I constructed the train and test data set, how many entries the train and test data set contain
+
+
 
     \section{Conclusions}
 
