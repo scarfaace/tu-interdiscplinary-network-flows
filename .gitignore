@@ -2,3 +2,11 @@
 **/__pycache__/
 **/.pytest_cache
 /model/data/old_v1/transcription_Tuesday.csv
+
+report/*.aux
+report/*.bbl
+report/*.blg
+report/*.log
+report/*.out
+report/*.synctex.gz
+report/*.toc
