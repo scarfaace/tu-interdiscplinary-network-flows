@@ -16,7 +16,11 @@
 \maketitle
 
 \section*{Abstract}
-The goal of this work was to design a suitable schema that transforms TCP/IP flows files to sentence-like transcriptions and implement a software in Python that does such transformation from \textit{pcap} files. The schema that we implemented uses printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) which makes 93 characters altogether. Our schema utilizes four communication features to express the final transcription -- packet size, communication gaps (communication silence), communication direction, elapsed time since the beginning of the communication. With a specific configuration that we used for these four features, we were able to to convert huge pcap files (circa 10GB) into few kB big files. At the same time we were able to produce quite decent results for a classification problem distinguishing between attack and non-attack flows. For this purpose we used Random Forest Classifier on top of bag of words.
+The goal of this work was to design a suitable schema that transforms TCP/IP flows into sentence-like transcriptions and implement a software in Python that does such transformation from \textit{pcap} files and to evaluate its suitability for attack detection.
+
+The schema that we implemented uses printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) which makes 93 characters altogether. Our schema utilizes four communication features to express the final transcription -- packet length, communication gaps (communication silence), communication direction, packet timestamp. With a specific configuration that we used for these four features, we were able to to convert huge pcap files (approximately 10GB) into few kB big files containing the sentence-like transcriptions of the network flows contained in those pcap files.
+
+At the same time we were able to produce quite decent results for a classification problem distinguishing between attack and non-attack flows. For this purpose we used Random Forest Classifier on top of a basic bag of words data set constructed from the sentence-like transcriptions.
 
 \newpage
 \tableofcontents
@@ -24,25 +28,27 @@ The goal of this work was to design a suitable schema that transforms TCP/IP flo
 
 \section{Background}
 \subsection{pcap2transcription}
+pcap2transcription \cite{pcap2transcription} is a preliminary project that tries to solve the same problem as our project tries to. The project uses a similar technique for creating the transcription schema. It also deals with IP packet lengths and flow directions. Uppercase symbols describe a communication in one direction and the lower case symbols describe the communication in the other direction. The dash character (\textit{-}) stands for 10ms without packet exchange (communication gap/silence). Also, the project does not work efficiently when it comes to feature extraction as well as memory. We improved these two in our project. However, the pcap2transcription project is basically a base for our project.
+
 
 \section{Methodology}
 \subsection{Data}
 % describe what data set I was working with (CIC2017 IDS dataset (synthetic labeled)
 For the purpose of our experiments we used the synthetic CIC IDS 2017 dataset \cite{sharafaldin2018toward}. The dataset contains pcap files and labels of the network flows. The labels are binary -- attack and non-attack.
 
-There are 5 different pcap files in this data set. Each of them represent a different day in the week from Monday to Friday. The size of all of them vary from 7GB up to 12GB. These files are packet captures.
+There are 5 different pcap files in this data set. Each of them represents a different day in the week from Monday to Friday. The size of all of them vary from 7GB up to 14GB. These files are packet captures.
 
 % describe how many packets do the files contain
 
 %-------------------------------------------------------
 \subsection{Data Exploration}\label{sec-dataset-exploration}
 % describe what I found in data -- show the charts from the 1st and 2nd report for Felix, describe these findings and later
-Since the beginning we decided to work with four network flow features -- protocol identifier, packet size, communication gaps (communication silence), communication direction, elapsed time since the beginning of the communication. Based on this decision we researched our dataset to find out more about these features and to drive our decisions later based on our findings.
+Since the beginning we decided to work with several network flow features -- protocol identifier, packet length, communication gaps (communication silence), communication direction, packet timestamp. Based on this decision we researched our dataset to find out more about these features and to drive our decisions later based on our findings.
 
 The protocol identifier was purely used for identification whether a packet is a TCP/IP packet or not. If it is not a TCP/IP packet, then, as the name of the project suggests, we do not care about the packet. If it is a TCP/IP packet, we work with that.
 
 \subsubsection{Packet Size}
-As \cite{oreilly-tcp} states, the minimum size of a TCP/IP packet is 21 bytes and the maximum size of such packet is $65\ 535$ bytes. We analysed the cumulative distribution function (CDF) of packet sizes of packets in our dataset. The output of our analysis is a figure \ref{fig-cdf-packet-sizes}. The figure provides us with information of what percentage of packets have size less than or equal to certain value. The figure shows us that almost all of the packet sizes are less than or equal to 5kB.
+As \cite{oreilly-tcp} states, the minimum size of a TCP/IP packet is 21 bytes and the maximum size of such packet is $65\ 535$ bytes. We analysed the cumulative distribution function (CDF) of packet sizes of the packets in our dataset. The output of our analysis is the figure \ref{fig-cdf-packet-sizes}. The figure provides us with information of what percentage of packets have size less than or equal to a certain value. The figure shows us that almost all of the packet sizes are less than or equal to 5kB.
 
 \begin{figure}[h!]
     \centering
@@ -55,21 +61,26 @@ As \cite{oreilly-tcp} states, the minimum size of a TCP/IP packet is 21 bytes an
 
 
 %-------------------------------------------------------
-\subsection{Schema}\label{sec-schema}
-% descrieb the schema definition. Describe what characters we use, describe how we distinguish between the flow directions, describe the binning
-The output of our data processing pipeline is a tsv file with four columns -- Source IP, Destination IP, Attack, Transcription. The IP addresses represent the communication endpoints. The Attack attribute contains a binary information whether the network flow is a attack or not. The Transcription attribute contains the transcription itself.
+\subsection{Schema Description}\label{sec-schema}
+Our transcription schema utilizes several network flow features. Among these are also the features that determine how output transcription schema will look like. These are \textit{communication direction}, \textit{communication silence}, \textit{packet timestamp} and \textit{packet length}.
 
-The transcription is a string of characters describing a network flow. We use 93 characters to describe flows by transcriptions. These are printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) where each character represents a captured packet size. Each character represents different packet sizes. The characters are ordered in the same chronological order as the packet captures.
+The first two were used because they are obvious and can easily help us with providing more information about the flows. The 3rd one, \textit{packet timestamp}, is used for multiple purposes. The first one is to determine when we should stop the transcription making process and cut off network flows. Once 1 minute elapses since the beginning of a network flow, we ignore this flow for the rest of the time. The second reason is that we decide the communication gaps based on the time differences of two consecutive packets.
 
-The very first character, exclamation mark, is used to represent a silence in a communication. One such character represents a silence of 1 second. The 46 characters starting from the quotation mark included up to the \textit{O} character included are used to describe one direction of a communication. The 46 characters starting from the \textit{P} character included up to the tilde character included are used to describe the other direction of a communication.
+We used the \textit{packet length} feature because among the other mentioned features, this is also one that we can find in an encrypted communication as well as in a non-encrypted communication. We also used this feature as the results from the research \cite{meghdouri2018analysis} show that packet length based features are a decisive factor for identifying malicious activity.
 
-Based on the research in the section \ref{sec-dataset-exploration} we utilized the characters in such way that the characters represent different bins of packet size. We reasonably chose binning based on the analysis of the figure \ref{fig-cdf-packet-sizes}. We encoded the packets of length $<= 2^{14}$ with first 30 characters, the packets of length $(2^{14}; 2^{16}]$ with the next 15 characters and the packets of length $> 2^{16}$ with the last (46th) character. Naturally, each communication direction utilizes its own character set as described in the section \ref{sec-dataset-exploration}. In every category the bins are of the same size. Meaning, in the first category there are 30 bins of the same size, in the second category there are 15 bins of the same size and in the last category there is just one bin.
+% The output of our data processing pipeline is a tsv file with four columns -- Source IP, Destination IP, Attack, Transcription. The IP addresses represent the communication endpoints. The Attack attribute contains a binary information whether the network flow is an attack or not. The Transcription attribute contains the transcription itself.
+
+The transcription is a string of characters describing a network flow. We use 93 characters to describe flows by transcriptions. These are printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) where each character represents a captured packet length. Each character represents different packet lengths. Transcription string characters are ordered in the same chronological order as the packet captures.
+
+The very first character, exclamation mark, is used to represent a silence in a communication. One exclamation mark represents a silence of 1 second. The 46 characters starting from the quotation mark included up to the \textit{O} character included are used to describe one direction of a communication. The 46 characters starting from the \textit{P} character included up to the tilde character included are used to describe the other direction of a communication.
+
+Based on the research in the section \ref{sec-dataset-exploration} we utilized the characters in such way that the characters represent different bins of packet lengths. We reasonably chose binning based on the analysis of the figure \ref{fig-cdf-packet-sizes}. We encoded the packets of lengths $<= 2^{14}$ with first 30 characters, the packets of lengths $(2^{14}; 2^{16}]$ with the next 15 characters and the packets of lengths $> 2^{16}$ with the last (46th) character. Naturally, each communication direction utilizes its own character set as described in the section \ref{sec-dataset-exploration}. In every category the bins are of the same size. Meaning, in the first category there are 30 bins of the same size, in the second category there are 15 bins of the same size and in the last category there is just one bin.
 
 %-------------------------------------------------------
 
 \subsection{Output Data Set}
 
-The output data set built from pcap files is a TSV file. The basic file structure is \textit{srcIP, dstIP, transcription}. The advanced file structure which contains also labels for network flows contains \textit{label} and \textit{attack} alongside the 3 mentioned attributes. An end-user will receive file of the basic structure if no file containing labels is specified. If such file is specified, the program tries to look up a label for each flow and assign a label and a type of attack to each entry of the output data set.
+The output data set built from pcap files is a TSV file. The basic file structure is \textit{srcIP, dstIP, transcription}. The advanced file structure which contains also labels for network flows contains \textit{label} attribute alongside the 3 mentioned attributes. An end-user will receive a file of the basic structure if no file containing labels is specified. If such file is specified, the program tries to look up a label for each flow and assign a label and a type of attack to each entry of the output data set.
 
 %-------------------------------------------------------
 
@@ -78,7 +89,7 @@ The output data set built from pcap files is a TSV file. The basic file structur
 % describe the software itself, the scripts for data processing, what language I used
 
 \subsubsection{Data Processing Pipeline}
-The software for processing the \textit{pcap} files and converting network flows into sentence-like transcriptions is a data processing pipeline consisted of two steps. The two-step process consists of extracting the necessary features from a \textit{pcap} file with go-flows and the 2nd step is the transcriptions building process itself based on the output from the 1st step. The data processing pipeline itself is a shell script that orchestrates the steps to be done in order to achieve the final output. The shell pipeline is located in \verb|/transcription/pipeline.sh|.
+The software for processing the \textit{pcap} files and converting network flows into sentence-like transcriptions is a data processing pipeline consisted of two steps. The two-step process consists of extracting the necessary features from a \textit{pcap} file with \textit{go-flows} software \cite{goflows-reference} and the 2nd step is the transcriptions building process itself based on the output from the 1st step. The data processing pipeline itself is a shell script that orchestrates the steps to be done in order to achieve the final output. The shell pipeline is located in \verb|/transcription/pipeline.sh|.
 
 
 \subsubsection{Transcriptions Maker}
@@ -88,7 +99,7 @@ The input CSV file for this core software is an output produced from go-flows. T
 
 Transcription maker filters the TCP packets from the input CSV file and subsequently the TCP packets get ASCII characters assigned to them based on the \textit{ipTotalLength} attribute as described in the section \ref{sec-schema}. Then, the sentence-like transcriptions of all the flows are built and outputted.
 
-The final structure of the output TSV file is the following: \textit{srcIP, dstIP, transcription}. If a file with labels assigned to the network flows was specified, the output TSV file additionally contains 2 more columns: \textit{label, attack}. Label is a binary label indicating whether a flow is attack or not. The attack attribute describes what type of attack it is.
+The final structure of the output TSV file is the following: \textit{srcIP, dstIP, transcription}. If a file with labels assigned to the network flows was specified, the output TSV file additionally contains one more column -- \textit{label}. Label is a binary label indicating whether a flow is attack or not.
 
 
 \subsection{Testing}
@@ -121,17 +132,55 @@ We used a very simple bag of words technique. For each entry of the data set (a 
 \label{fig-bag-of-words-example}
 \end{figure}
 
-We trained a Random Forest model on top of the bag of words data set. As our data set was imbalanced -- approximately 10:2 ratio of non-attacks to attacks -- we considered this during the Random Forest model training. To put a higher to attacks so that we simulate the balance of the classes.
+We did two testing experiments. In both of them we trained a Random Forest model on top of the bag of words data set. In the first our training set consisted of $1\ 600$ non-attacks and 262 attacks. Since the classes were imbalanced in a certain ratio, we used this ratio to simulate the balance between the two classes. We put 8-times higher weight on attacks than on non-attacks during the model training phase.
+
+Second, we trained another Random Forest model on top of bag words data set. However, this time we used $16\ 000$ non-attacks and the same number of attacks as before -- 262. As the ratio of number of samples between the two classes increased from 8:1 to 80:1, we also adjusted the class weights and therefore we put 80-times higher weight on attacks than on non-attacks during the model training phase.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{final-report/img/8-1_confusion-matrix-absolute.png}
+    \caption{Confusion matrix with absolute values for the first testing experiment}
+    \label{fig-8-1-absolute}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{final-report/img/8-1_confusion-matrix-normalized.png}
+    \caption{Confusion matrix with normalized values for the first testing experiment}
+    \label{fig-8-1-normalized}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{final-report/img/80-1_confusion-matrix-absolute.png}
+    \caption{Confusion matrix with absolute values for the second testing experiment}
+    \label{fig-80-1-absolute}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{final-report/img/80-1_confusion-matrix-normalized.png}
+    \caption{Confusion matrix with normalized values for the second testing experiment}
+    \label{fig-80-1-normalized}
+\end{figure}
+
+The confusion matrices in figures \ref{fig-8-1-absolute}, \ref{fig-8-1-normalized}, \ref{fig-80-1-absolute}, \ref{fig-80-1-normalized} clearly show that the Random Forest model predicts non-attacks with very high precision ($98\%$ and $98,8\%$ non-attacks are classified correctly).
+On the other hand, attacks are classified with quite poor precision, but at least some of then are detected ($13,6\%$ and $10,6\%$ of attacks are classified correctly). This means that there are a lot of false negatives in the attacks class.
+
+
 
 % describe the results that I got (the confusion matrix, accuracy etc). Next describe how I constructed the train and test data set, how many entries the train and test data set contain
 
 
-
+\clearpage
 \section{Conclusions}
+The results that we obtained are not that bad even though there is a huge room for improvement. Basically, we are able to detect around $10\%$ of attacks and at the same time misclassify only a very few non-attacks.
+
+While building the schema we tried to avoid such network flow features that could not be used at encrypted communication. Basically all the features except of \textit{protocol identifier} are features that we can use while working with encrypted communication. The \textit{protocol identifier} feature can not be obtained in the IPSec encryption protocol. As soon as we find a way how to filter TCP/IP communication from the pcap captures without using the \textit{protocol identifier} feature, our schema can be fully used for classifying encrypted communication.
 
 
 
-
+\clearpage
 \bibliographystyle{plain}
 \bibliography{references}
 
