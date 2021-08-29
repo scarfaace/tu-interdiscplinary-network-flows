@@ -13,9 +13,9 @@ Flow extractor: https://github.com/CN-TU/go-flows
 
 1-page project outline: https://www.overleaf.com/project/5fb786ec59a7beec1c00b0a2
 
---
+---
 
-## Run Manual Tests
+## pcap to NTFT transformartion
 
 In `src/main/test/resources/test1.csv` there is a small testing file which represents output from the feature extraction
 script and this goes to the transcription script.
@@ -58,13 +58,19 @@ will not longer be anyhow distinguished.
 
 ## Releases
 
-### v0.0.1
-- just ASCII characters ranging from the character `!` (dec code 33) to the character `~` (dec code 126),
-- `!` is used as character for representing 10ms gap,
-- therefore 94 characters are available for encoding packet length,
-    - we use 70 of them for encoding length <= 16 384
-    - and remaining 23 for encoding length > 16 384
-- no communication direction distinction
+[comment]: <> (### v0.0.1)
+
+[comment]: <> (- just ASCII characters ranging from the character `!` &#40;dec code 33&#41; to the character `~` &#40;dec code 126&#41;,)
+
+[comment]: <> (- `!` is used as character for representing 10ms gap,)
+
+[comment]: <> (- therefore 94 characters are available for encoding packet length,)
+
+[comment]: <> (    - we use 70 of them for encoding length <= 16 384)
+
+[comment]: <> (    - and remaining 23 for encoding length > 16 384)
+
+[comment]: <> (- no communication direction distinction)
 
 
 ### v1.0.0
@@ -91,15 +97,23 @@ will not longer be anyhow distinguished.
 
 ### pipeline.sh
 - the script `pipeline.sh` creates NTFT out of the specified pcap file
-- note, that right now the `pipeline.sh` script is tailored for processing CIC2017 IDS data as well as
-  labeling them (attacks/non-attack)
+- mind that right now the `pipeline.sh` script is tailored for processing CI IDS C2017 data as well as
+  labeling them (attacks/non-attack) but it can be easily adjusted, i.e. use different pcap file argument
 - how to run:
-  - extract `transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv.gz` into `transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv`
+  - extract CIC IDS 2017 dataset labels `/transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv.gz` into `transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv`
   - download any pcap day data from http://205.174.165.80/CICDataset/CIC-IDS-2017/Dataset/PCAPs/ and save it into 
-    the folder `transcription/resources/CIC-IDS-2017` with its original name (e.g. `Monday-WorkingHours.pcap`)
+    the folder `/transcription/resources/CIC-IDS-2017` with its original name (e.g. `Monday-WorkingHours.pcap`)
   - navigate to the `transcription` folder in the root directory 
-  - run `pipeline.sh` with the 1st parameter the name of the day that you downloaded
+  - run `pipeline.sh` with the 1st parameter as the name of the day that you downloaded and the script will fill in everything else
   - examples: 
     - `./pipeline.sh Monday`
     - `./pipeline.sh Tuesday`
-  - after the run is finished, you can find your output files in `transcription/out/`
+  - after the run is finished, you can find your final output NTFT files in `/transcription/out/`
+
+
+### pipeline-general.sh
+
+- `pipeline-general.sh` allows you to run the whole pcap to NTFT pipeline with your defined input pcap file
+- just run pipeline-general.sh script with the 1st argument specifying the path to your pcap file
+- example: `./pipeline.sh /home/myuser/test.pcap`
+- the final output NTFT file will be stored in `/transcription/out/` folder
