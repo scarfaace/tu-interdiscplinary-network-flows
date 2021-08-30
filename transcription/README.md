@@ -86,12 +86,13 @@ will not longer be anyhow distinguished.
 
 ---
 
-## TODO
+[comment]: <> (## TODO)
 
-- make visualizations for the packet size in time for each flow
-- make a model for a numeric vector (e.g. AGM) so that I can compare it with the bag of words model
+[comment]: <> (- make visualizations for the packet size in time for each flow)
 
----
+[comment]: <> (- make a model for a numeric vector &#40;e.g. AGM&#41; so that I can compare it with the bag of words model)
+
+[comment]: <> (---)
 
 ## Available Scripts
 
@@ -117,3 +118,17 @@ will not longer be anyhow distinguished.
 - just run pipeline-general.sh script with the 1st argument specifying the path to your pcap file
 - example: `./pipeline.sh /home/myuser/test.pcap`
 - the final output NTFT file will be stored in `/transcription/out/` folder
+
+---
+
+## Examples
+
+While located in `/transcription` directory, run
+
+```shell
+./pipeline.sh ./in/test.pcap
+```
+
+in order to convert a test pcap file `/transcription/in/test.pcap` into NTFT.
+You will find the output TSV file in `/transcription/out/` as described in the section
+about [pipeline-general.sh](#pipeline-generalsh)
