@@ -1,30 +1,33 @@
 from transcription.TmpStreamReader import TmpStreamReader
 from transcription.labels.processing import LabelObject
 
-
+from transcription.utils import IpKeyUtil
 
 
 class BasicOutputPrinter:
-    def __init__(self):
-        self.header = 'ipPair\ttranscription'
+    def __init__(self, ipKeyUtil: IpKeyUtil):
+        self.header = 'srcIp\tdstIp\ttranscription'
+        self.ipKeyUtil = ipKeyUtil
 
     def print(self, streams):
         print(self.header)
         for hosts_pair_key in streams:
+            ip1, ip2 = self.ipKeyUtil.split_ip_key(hosts_pair_key)
             symbols_stream = TmpStreamReader.read_stream_from_file(hosts_pair_key)
-            output_line = '{}\t{}'.format(hosts_pair_key, symbols_stream)
+            output_line = '{}\t{}\t{}'.format(ip1, ip2, symbols_stream)
             print(output_line)
 
 
 
 class LabelsOutputPrinter:
-    def __init__(self):
+    def __init__(self, ipKeyUtil: IpKeyUtil):
         self.header = 'srcIP\tdstIP\tlabel\tattack\ttranscription'
+        self.ipKeyUtil = ipKeyUtil
 
     def print(self, labels, streams):
         print(self.header)
         for hosts_pair_key in streams:
-            ip1, ip2 = self.__split_ip_key(hosts_pair_key)
+            ip1, ip2 = self.ipKeyUtil.split_ip_key(hosts_pair_key)
             label = self.__find_ip_pair_in_labels(labels, ip1, ip2)
             symbols_stream = TmpStreamReader.read_stream_from_file(hosts_pair_key)
             output_line = '{}\t{}\t{}\t{}\t{}'.format(ip1, ip2, label.label, label.attack, symbols_stream)
@@ -41,8 +44,3 @@ class LabelsOutputPrinter:
             return labels[key2]
         else:
             return LabelObject(None, None)
-
-
-    def __split_ip_key(self, ip_key: str):
-        split_arr = ip_key.split(sep='-')
-        return split_arr[0], split_arr[1]

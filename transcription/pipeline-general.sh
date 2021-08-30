@@ -32,7 +32,7 @@ echo
 echo "Extracting flows as conversation transcriptions"
 echo `date`
 python3 src/main/python/transcription/main.py --filename "$feature_extraction_output_file_path" > "$out_transcription_file_path"
-echo "Finished creating text-like transcriptions of network flows."
+echo "Finished creating sentence-like transcriptions of network flows."
 echo `date`
 echo
 
