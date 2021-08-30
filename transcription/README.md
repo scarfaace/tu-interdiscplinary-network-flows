@@ -15,21 +15,26 @@ Flow extractor: https://github.com/CN-TU/go-flows
 
 ---
 
-## pcap to NTFT transformartion
+[comment]: <> (## pcap to NTFT transformartion)
 
-In `src/main/test/resources/test1.csv` there is a small testing file which represents output from the feature extraction
-script and this goes to the transcription script.
+[comment]: <> (In `src/main/test/resources/test1.csv` there is a small testing file which represents output from the feature extraction)
 
-To run transcription script with these data, run the following while located in the root directory of the project
-```
-export PYTHONPATH=`pwd`/src/main/
-python3 src/main/python/transcription/main.py --filename src/test/resources/test1.csv > test_tr.txt
-````
+[comment]: <> (script and this goes to the transcription script.)
 
-Mind that the `export` of `PYTHONPATH` is very important to be able to include the python project's local modules.
+[comment]: <> (To run transcription script with these data, run the following while located in the root directory of the project)
+
+[comment]: <> (```)
+
+[comment]: <> (export PYTHONPATH=`pwd`/src/main/)
+
+[comment]: <> (python3 src/main/python/transcription/main.py --filename src/test/resources/test1.csv > test_tr.txt)
+
+[comment]: <> (````)
+
+[comment]: <> (Mind that the `export` of `PYTHONPATH` is very important to be able to include the python project's local modules.)
 
 
----
+[comment]: <> (---)
 
 go-flows uses IANA features - https://www.iana.org/assignments/ipfix/ipfix.xml
 
@@ -94,6 +99,19 @@ will not longer be anyhow distinguished.
 
 [comment]: <> (---)
 
+## Dependencies
+
+- the project runs on python 3.7
+- we recommend you to use Conda virtual environment using [Anaconda](https://www.anaconda.com/)
+  - this will easily make you choose python 3.7 as the environment's python binary
+- *go-flows* software is required in order to extract packet features from pcap files:
+  - install the `go` compiler first: https://golang.org/doc/install
+  - execute `go get github.com/CN-TU/go-flows` in a terminal
+  - maybe your OS will be missing some C files, then you need to install these dependencies
+    as well (use Google to find out how to download them please)
+
+--------------------------
+
 ## Available Scripts
 
 ### pipeline.sh
@@ -126,7 +144,7 @@ will not longer be anyhow distinguished.
 While located in `/transcription` directory, run
 
 ```shell
-./pipeline.sh ./in/test.pcap
+./pipeline-general.sh ./in/test.pcap
 ```
 
 in order to convert a test pcap file `/transcription/in/test.pcap` into NTFT.
