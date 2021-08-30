@@ -116,8 +116,8 @@ will not longer be anyhow distinguished.
 
 ### pipeline.sh
 - the script `pipeline.sh` creates NTFT out of the specified pcap file
-- mind that right now the `pipeline.sh` script is tailored for processing CI IDS C2017 data as well as
-  labeling them (attacks/non-attack) but it can be easily adjusted, i.e. use different pcap file argument
+- mind that right now the `pipeline.sh` script is tailored for processing CIC IDS 2017 data as well as
+  labeling them (attacks/non-attack)
 - how to run:
   - extract CIC IDS 2017 dataset labels `/transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv.gz` into `transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv`
   - download any pcap day data from http://205.174.165.80/CICDataset/CIC-IDS-2017/Dataset/PCAPs/ and save it into 
