@@ -1,7 +1,7 @@
 {
     "features": [
     	"flowStartMilliseconds",
-    	"protocolIdentifier",     // problem in IPSec.. try not to use at all, just exclude IPv6 communications
+    	"protocolIdentifier",
     	"sourceIPAddress",
     	"destinationIPAddress",
     	"ipTotalLength"
