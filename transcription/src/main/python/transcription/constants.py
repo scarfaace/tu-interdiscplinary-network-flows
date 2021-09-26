@@ -1,4 +1,0 @@
-TMP_STREAMS_FOLDER = 'tmp_streams'
-
-TMP_FILE_PATH_FORMAT = TMP_STREAMS_FOLDER + '/{}.txt'
-
