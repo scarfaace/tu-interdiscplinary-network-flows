@@ -1,11 +1,7 @@
-from transcription.configuration import configuration, Configuration
 from transcription.constants import TMP_FILE_PATH_FORMAT
 
 
 class TmpStreamReader:
-
-    def __init__(self, configurationParam: Configuration):
-        self.configuration = configurationParam
 
     @classmethod
     def read_stream_from_file(cls, stream_key) -> str:
@@ -15,4 +11,4 @@ class TmpStreamReader:
             return f.readline()
 
 
-tmpStreamReader = TmpStreamReader(configuration)
+tmpStreamReader = TmpStreamReader()

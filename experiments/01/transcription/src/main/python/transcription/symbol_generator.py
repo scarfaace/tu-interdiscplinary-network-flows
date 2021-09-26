@@ -1,6 +1,8 @@
 from decimal import Decimal
 from math import floor
 
+from transcription.configuration import Configuration
+
 
 class CommunicationGapsGenerator:
     def __init__(self):
@@ -9,7 +11,7 @@ class CommunicationGapsGenerator:
     def generate(self, entry, stream_last_time):
         time_diff_ms = Decimal(str(entry.timestamp)) - Decimal(str(stream_last_time))
         # print('time_diff: {}'.format(time_diff_ms), file=sys.stderr)
-        gaps_count = floor(time_diff_ms/1000)
+        gaps_count = floor(time_diff_ms/Configuration.MILLISECONDS_PER_GAP)
         gaps = [self.gap_symbol] * gaps_count
         # print('time_diff: {}\ntime_diff_ms: {}\ntime_diff_10s_ms: {}\ngaps: {}'.format(time_diff, time_diff_ms, time_diff_tens_ms, len(gaps)), file=sys.stderr)
         return gaps
