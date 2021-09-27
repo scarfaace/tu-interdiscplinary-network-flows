@@ -1,30 +1,58 @@
 import csv
+import sys
 
-from transcription.flows.KeyGenerator import TcpPacketEntryKeyGenerator
 from transcription.StreamFlusher import StreamFlusher
 from transcription.symbol_generator import CommunicationGapsGenerator, TcpLenSymbolGenerator
 
+csv.field_size_limit(sys.maxsize)
 
-class Packet:
-    def __init__(self, timestamp, protocol_identifier, ip_source, ip_dest, tcp_len):
-        self.timestamp = timestamp
-        self.protocol_identifier = protocol_identifier
-        self.ip_source = ip_source
-        self.ip_dest = ip_dest
-        self.tcp_len = tcp_len
+
+
+class ExtractedFeaturesRow:
+    def __init__(self, flowStartMilliseconds, flowDurationMilliseconds, sourceIPAddress, destinationIPAddress,
+                 packetTotalCount, accumulate_ipTotalLength, accumulate_interPacketTimeMilliseconds, accumulate_flowDirection):
+        self.flowStartMilliseconds = flowStartMilliseconds
+        self.flowDurationMilliseconds = flowDurationMilliseconds
+        self.sourceIPAddress = sourceIPAddress
+        self.destinationIPAddress = destinationIPAddress
+        self.packetTotalCount = packetTotalCount
+        self.accumulate_ipTotalLength = accumulate_ipTotalLength
+        self.accumulate_interPacketTimeMilliseconds = accumulate_interPacketTimeMilliseconds
+        self.accumulate_flowDirection = accumulate_flowDirection
 
     @classmethod
     def build_from_row(cls, row):
-        return Packet(
-            timestamp=float(row[0]),
-            protocol_identifier=int(row[1]),
-            ip_source=row[2],
-            ip_dest=row[3],
-            tcp_len=int(row[4])
+        return ExtractedFeaturesRow(
+            flowStartMilliseconds=float(row[0]),
+            flowDurationMilliseconds=float(row[1]),
+            sourceIPAddress=row[2],
+            destinationIPAddress=row[3],
+            packetTotalCount=row[4],
+            accumulate_ipTotalLength=cls.parse_row_array_integers(row[5]),
+            accumulate_interPacketTimeMilliseconds=cls.parse_row_array_integers(row[6]),
+            accumulate_flowDirection=cls.parse_row_array_booleans(row[7])
         )
 
+    @classmethod
+    def parse_row_array_integers(cls, rowArray: str):
+        if rowArray is None or rowArray == '':
+            return []
+        rowArrayCleaned = rowArray[1:len(rowArray)-1]
+        return list(map(lambda x: int(x), rowArrayCleaned.split(' ')))
+
+    @classmethod
+    def parse_row_array_booleans(cls, rowArray: str):
+        if rowArray is None or rowArray == '':
+            return []
+        rowArrayCleaned = rowArray[1:len(rowArray)-1]
+        return list(map(lambda x: True if x == "true" else False, rowArrayCleaned.split(' ')))
 
 
+class Transcription:
+    def __init__(self, flowStartMilliseconds: int, flowDurationMilliseconds: int, transcriptionString: str):
+        self.flowStartMilliseconds = flowStartMilliseconds
+        self.flowDurationMilliseconds = flowDurationMilliseconds
+        self.transcriptionString = transcriptionString
 
 
 
@@ -32,8 +60,6 @@ class Packet:
 class InputFileProcessor:
 
     def __init__(self):
-        self.ACTIVE_TIMEOUT_SECONDS = 60
-
         self.streams = {}
         self.streams_first_timestamps = {}
         self.streams_last_timestamps = {}
@@ -47,31 +73,45 @@ class InputFileProcessor:
             csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
             next(csv_reader)        # skip header
             for row in csv_reader:
-                entry = Packet.build_from_row(row)
-                if not self.__is_tcp_packet(entry):
-                    continue
-                if self.min_time is None:
-                    self.min_time = entry.timestamp
+                # print(iterator)
+                row = ExtractedFeaturesRow.build_from_row(row)
 
-                key = TcpPacketEntryKeyGenerator.generate_key(self.streams, entry)
+                key = row.sourceIPAddress + "-" + row.destinationIPAddress
+                transcriptionArray = []
+
+                actual_packet_timestamp = row.flowStartMilliseconds
+                previous_packet_timestamp = row.flowStartMilliseconds
+
+                for index in range(len(row.accumulate_ipTotalLength)):
+                    # print(index)
+                    if index != 0:
+                        previous_packet_timestamp = actual_packet_timestamp
+                        actual_packet_timestamp = actual_packet_timestamp + row.accumulate_interPacketTimeMilliseconds[index-1]
+
+                    actual_packet_length: int = row.accumulate_ipTotalLength[index]
+                    actual_packet_direction: bool = row.accumulate_flowDirection[index]
+
+                    symbol: str = TcpLenSymbolGenerator.generate(actual_packet_length, actual_packet_direction)
+                    communication_gaps: list = self.communication_gaps_generator.generate(previous_packet_timestamp, actual_packet_timestamp)
+
+                    transcriptionArray.extend(communication_gaps)
+                    transcriptionArray.append(symbol)
+
+                # iterator += 1
+                # if iterator == 500000:
+                #     iterator = 0
+                #     self.__flush()
+                #
                 if key not in self.streams.keys():
                     self.streams[key] = []
-                    self.streams_first_timestamps[key] = float(entry.timestamp)
-                    self.streams_last_timestamps[key] = float(entry.timestamp)
+                transcriptionString: str = ''.join(transcriptionArray)
+                transcription: Transcription = Transcription(
+                    row.flowStartMilliseconds,
+                    row.flowDurationMilliseconds,
+                    transcriptionString)
+                self.streams[key].append(transcription)
 
-                if self.__is_flow_timed_out(key, entry.timestamp):
-                    continue
-
-                self.__generate_output_symbols(entry, key)
-
-                self.streams_last_timestamps[key] = float(entry.timestamp)
-
-                iterator += 1
-                if iterator == 500000:
-                    iterator = 0
-                    self.__flush()
-
-            self.__flush()
+            # self.__flush()
         return self.streams
 
 
@@ -81,8 +121,8 @@ class InputFileProcessor:
             self.streams[key].clear()
 
 
-    def __is_tcp_packet(self, packet: Packet):
-        return packet.protocol_identifier == 6
+    # def __is_tcp_packet(self, packet: Packet):
+    #     return packet.protocol_identifier == 6
 
 
     def __generate_output_symbols(self, entry, key):
@@ -90,12 +130,3 @@ class InputFileProcessor:
         symbol = TcpLenSymbolGenerator.generate(entry, key)
         self.streams[key].extend(communication_gaps)
         self.streams[key].append(symbol)
-
-    def __is_flow_timed_out(self, key: str, packetTimestamp: float):
-        first_and_last_timestamp_diff_ms = packetTimestamp - self.streams_first_timestamps[key]
-        first_and_last_timestamp_diff_seconds = first_and_last_timestamp_diff_ms / 1000
-        if first_and_last_timestamp_diff_seconds >= self.ACTIVE_TIMEOUT_SECONDS:
-            return True
-        return False
-
-
