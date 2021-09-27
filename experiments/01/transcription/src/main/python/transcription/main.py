@@ -2,10 +2,9 @@ import shutil
 
 from transcription.arguments import MyArgumentsParser
 from transcription.constants import TMP_STREAMS_FOLDER
-from transcription.labels.processing import LabelsFileLoader
+from transcription.labels.processing import LabelsFileLoader, Labels, LabelingService
 from transcription.output import BasicOutputPrinter, LabelsOutputPrinter
 from transcription.processing import InputFileProcessor
-
 from transcription.utils import IpKeyUtil
 
 
@@ -20,15 +19,16 @@ if __name__ == '__main__':
 
     ipKeyUtil = IpKeyUtil()
     baseOutputPrinter = BasicOutputPrinter(ipKeyUtil)
-    labelsOutputPrinter = LabelsOutputPrinter(ipKeyUtil)
 
     arguments = my_arguments_parser.parse_arguments()
 
     processed_streams = inputFileProcessor.process(arguments.filename)
     if arguments.labels_filename is not None:
-        loaded_labels = labelsFileLoader.load(arguments.labels_filename)
-        labelsOutputPrinter.print(loaded_labels, processed_streams)
+        labels: Labels = labelsFileLoader.load(arguments.labels_filename)
+        labelingService: LabelingService = LabelingService(labels)
+        labelsOutputPrinter = LabelsOutputPrinter(ipKeyUtil, labelingService)
+        labelsOutputPrinter.print(processed_streams)
     else:
         baseOutputPrinter.print(processed_streams)
 
-    clean_tmp_streams()
+    # clean_tmp_streams()
