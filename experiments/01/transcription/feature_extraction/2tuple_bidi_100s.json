@@ -2,8 +2,8 @@
   "version": "v2",
   "preprocessing": {
     "flows": [{
-      "active_timeout": 100,
-      "idle_timeout": 100,
+      "active_timeout": 60,
+      "idle_timeout": 60,
       "features": [
         "flowStartMilliseconds",
         "flowDurationMilliseconds",
@@ -11,7 +11,7 @@
         "destinationIPAddress",
         "packetTotalCount",
         {"accumulate": ["ipTotalLength"]},
-        {"accumulate": ["_interPacketTimeMicroseconds"]},
+        {"accumulate": ["_interPacketTimeMilliseconds"]},
         {"accumulate": ["flowDirection"]}
       ],
 
