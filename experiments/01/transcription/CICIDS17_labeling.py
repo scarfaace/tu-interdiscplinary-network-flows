@@ -34,7 +34,7 @@ def read_data(day):
 def save_data(day):
 	global data
 	print(">> Saving {}".format(day))
-	data.to_csv("{}.tsv".format(day), index= False, sep='\t')
+	data.to_csv("{}.tsv".format(day), index=False, sep='\t', quoting=3)
 	del data
 	print("#"*20)
 
@@ -155,21 +155,13 @@ data['Label'] = np.where(data['Attack'] == "Normal", 0, 1)
 ##################################################################
 #read_data("Friday")
 
-setting_label(sip="205.174.165.73",
-	          st=time_fixing(7, 10, 0), et=time_fixing(7, 11, 4),
-	          attack="Botnet:ARES")
+setting_label(sip="205.174.165.73", st=time_fixing(7, 10, 0), et=time_fixing(7, 11, 4), attack="Botnet:ARES")
 
-setting_label(dip="205.174.165.73", 
-	          st=time_fixing(7, 10, 0), et=time_fixing(7, 11, 4),
-	          attack="Botnet:ARES")
+setting_label(dip="205.174.165.73", st=time_fixing(7, 10, 0), et=time_fixing(7, 11, 4), attack="Botnet:ARES")
 
-setting_label(sip="172.16.0.1", dip="192.168.10.50", 
-	          st=time_fixing(7, 13, 53), et=time_fixing(7, 14, 37),
-	          attack="PortScan:PortScan - Firewall on")
+setting_label(sip="172.16.0.1", dip="192.168.10.50", st=time_fixing(7, 13, 53), et=time_fixing(7, 14, 37), attack="PortScan:PortScan - Firewall on")
 
-setting_label(sip="172.16.0.1", dip="192.168.10.50", 
-	          st=time_fixing(7, 14, 49), et=time_fixing(7, 15, 31),
-	          attack="PortScan:PortScan - Firewall off")
+setting_label(sip="172.16.0.1", dip="192.168.10.50", st=time_fixing(7, 14, 49), et=time_fixing(7, 15, 31), attack="PortScan:PortScan - Firewall off")
 
 setting_label(sip="172.16.0.1", dip="192.168.10.50", 
 	          st=time_fixing(7, 15, 54), et=time_fixing(7, 16, 18),
