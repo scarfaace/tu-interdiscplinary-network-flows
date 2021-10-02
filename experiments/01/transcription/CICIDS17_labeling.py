@@ -160,12 +160,22 @@ setting_label(sip="205.174.165.73", st=time_fixing(7, 10, 0), et=time_fixing(7, 
 setting_label(dip="205.174.165.73", st=time_fixing(7, 10, 0), et=time_fixing(7, 11, 4), attack="Botnet:ARES")
 
 setting_label(sip="172.16.0.1", dip="192.168.10.50", st=time_fixing(7, 13, 53), et=time_fixing(7, 14, 37), attack="PortScan:PortScan - Firewall on")
+# setting_label(sip="205.174.165.73", dip="205.174.165.68", st=time_fixing(7, 13, 53), et=time_fixing(7, 14, 37), attack="PortScan:PortScan - Firewall on")  # changes nothing
 
 setting_label(sip="172.16.0.1", dip="192.168.10.50", st=time_fixing(7, 14, 49), et=time_fixing(7, 15, 31), attack="PortScan:PortScan - Firewall off")
+# setting_label(sip="205.174.165.73", dip="205.174.165.68", st=time_fixing(7, 14, 49), et=time_fixing(7, 15, 31), attack="PortScan:PortScan - Firewall off")  # changes nothing
 
-setting_label(sip="172.16.0.1", dip="192.168.10.50", 
-	          st=time_fixing(7, 15, 54), et=time_fixing(7, 16, 18),
-	          attack="DDoS:LOIT")
+setting_label(sip="172.16.0.1", dip="192.168.10.50", st=time_fixing(7, 15, 54), et=time_fixing(7, 16, 18), attack="DDoS:LOIT")
+# the following changes nothing
+# setting_label(sip="205.174.165.69", dip="192.168.10.50", st=time_fixing(7, 15, 54), et=time_fixing(7, 16, 18), attack="DDoS:LOIT")
+# setting_label(sip="205.174.165.70", dip="192.168.10.50", st=time_fixing(7, 15, 54), et=time_fixing(7, 16, 18), attack="DDoS:LOIT")
+# setting_label(sip="205.174.165.71", dip="192.168.10.50", st=time_fixing(7, 15, 54), et=time_fixing(7, 16, 18), attack="DDoS:LOIT")
+#
+# setting_label(sip="205.174.165.69", dip="205.174.165.68", st=time_fixing(7, 15, 54), et=time_fixing(7, 16, 18), attack="DDoS:LOIT")
+# setting_label(sip="205.174.165.70", dip="205.174.165.68", st=time_fixing(7, 15, 54), et=time_fixing(7, 16, 18), attack="DDoS:LOIT")
+# setting_label(sip="205.174.165.71", dip="205.174.165.68", st=time_fixing(7, 15, 54), et=time_fixing(7, 16, 18), attack="DDoS:LOIT")
+
+
 
 data['Label'] = np.where(data['Attack'] == "Normal", 0, 1)
 
