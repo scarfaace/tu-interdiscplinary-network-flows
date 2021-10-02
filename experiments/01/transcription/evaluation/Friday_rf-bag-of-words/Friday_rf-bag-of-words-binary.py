@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from pandas import DataFrame
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -11,8 +12,8 @@ from sklearn.model_selection import train_test_split
 
 #%%
 # Read data
-mergedAllDf = pd.read_csv("experiments/01/transcription/out/Thursday_transcription_labeled.tsv", sep='\t', quoting=3)
-nonAttacksDf = mergedAllDf[mergedAllDf.Label == 0].sample(n=2000, random_state=123)
+mergedAllDf = pd.read_csv("experiments/01/transcription/out/Friday_transcription_labeled.tsv", sep='\t', quoting=3)
+nonAttacksDf = mergedAllDf[mergedAllDf.Label == 0].sample(n=5500, random_state=123)
 attacksDf = mergedAllDf[mergedAllDf.Label == 1]
 
 nonAttacksDf = nonAttacksDf[['Label', 'transcription']]
@@ -27,9 +28,9 @@ print("Samples per class: {}".format(np.bincount(commonDf['Label'])))
 #%%
 # Create train and test data
 X_train_attacks, X_test_attacks, y_train_attacks, y_test_attacks = \
-    train_test_split(attacksDf, attacksDf.Label, test_size=0.2, random_state=123)
+    train_test_split(attacksDf, attacksDf.Label, test_size=0.3, random_state=123)
 X_train_nonAttacks, X_test_nonAttacks, y_train_nonAttacks, y_test_nonAttacks = \
-    train_test_split(nonAttacksDf, nonAttacksDf.Label, test_size=0.2, random_state=123)
+    train_test_split(nonAttacksDf, nonAttacksDf.Label, test_size=0.3, random_state=123)
 
 X_train = pd.concat([X_train_attacks, X_train_nonAttacks])['transcription']
 X_test = pd.concat([X_test_attacks, X_test_nonAttacks])['transcription']
@@ -74,10 +75,16 @@ print("Test set score:  {:.3f}".format(model.score(X_test_words, y_test)))
 
 
 #%%
-# predictions = model.predict(X_test_words)
-# confusion_matrix = confusion_matrix(y_test, predictions)
-# print("Confusion matrix:\n{}".format(confusion_matrix))
+predictions = model.predict(X_test_words)
+confusion_matrix_result = confusion_matrix(y_test, predictions)
+print("Confusion matrix:\n{}".format(confusion_matrix_result))
 
+predictionsDf: DataFrame = pd.DataFrame({
+    'transcription': X_test,
+    'Label': y_test,
+    'Label_predicted': predictions
+})
+predictionsDf.to_csv('predictions.csv', index=False, sep="\t", quoting=3)
 
 #%%
 # https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
