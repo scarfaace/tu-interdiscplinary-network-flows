@@ -36,7 +36,9 @@ pcap2transcription \cite{pcap2transcription} is a preliminary project that tries
 % describe what data set I was working with (CIC2017 IDS dataset (synthetic labeled)
 For the purpose of our experiments we used the synthetic CIC IDS 2017 dataset \cite{sharafaldin2018toward}. The dataset contains pcap files and labels of the network flows. The labels are binary -- attack and non-attack.
 
-There are 5 different pcap files in this data set. Each of them represents a different day in the week from Monday to Friday. The size of all of them vary from 7GB up to 14GB. These files are packet captures.
+There are 5 different pcap files in this data set. Each of them represents a different day in the week from Monday to Friday. The size of all of them vary from 7GB up to 14GB.\\
+
+\noindent\textbf{Labeling}\\
 
 % describe how many packets do the files contain
 
@@ -62,19 +64,60 @@ As \cite{oreilly-tcp} states, the minimum size of a TCP/IP packet is 21 bytes an
 
 %-------------------------------------------------------
 \subsection{Schema Description}\label{sec-schema}
-Our transcription schema utilizes several network flow features. Among these are also the features that determine how output transcription schema will look like. These are \textit{communication direction}, \textit{communication silence}, \textit{packet timestamp} and \textit{packet length}.
+Our transcription schema utilizes several network flow features. Among these are also the features that determine how output transcription schema will look like. These are:
 
-The first two were used because they are obvious and can easily help us with providing more information about the flows. The 3rd one, \textit{packet timestamp}, is used for multiple purposes. The first one is to determine when we should stop the transcription making process and cut off network flows. Once 1 minute elapses since the beginning of a network flow, we ignore this flow for the rest of the time. The second reason is that we decide the communication gaps based on the time differences of two consecutive packets.
+\begin{itemize}
+    \item \textit{communication direction},
+    \item \textit{communication silence},
+    \item \textit{packet timestamp},
+    \item \textit{packet length}.
+\end{itemize}
 
-We used the \textit{packet length} feature because among the other mentioned features, this is also one that we can find in an encrypted communication as well as in a non-encrypted communication. We also used this feature as the results from the research \cite{meghdouri2018analysis} show that packet length based features are a decisive factor for identifying malicious activity.
+The first two are used because they are obvious and can easily help us with providing more information about the flows. The 3rd one, \textit{packet timestamp}, is used for multiple purposes. The first one is present to help our transcription maker determine when we should stop the transcription making process and cut off network flows. Once 1 minute elapses since the beginning of a network flow, we ignore this flow for the rest of the time. The second reason is that we decide the communication silences based on the time differences of two consecutive packets.
+
+We use the \textit{packet length} feature because among the other mentioned features, this is also one that we can find in an encrypted communication as well as in a non-encrypted communication. We also used this feature as the results from the research \cite{meghdouri2018analysis} show that packet length based features are a decisive factor for identifying malicious activity.
 
 % The output of our data processing pipeline is a tsv file with four columns -- Source IP, Destination IP, Attack, Transcription. The IP addresses represent the communication endpoints. The Attack attribute contains a binary information whether the network flow is an attack or not. The Transcription attribute contains the transcription itself.
 
 The transcription is a string of characters describing a network flow. We use 93 characters to describe flows by transcriptions. These are printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) where each character represents a captured packet length. Each character represents different packet lengths. Transcription string characters are ordered in the same chronological order as the packet captures.
 
-The very first character, exclamation mark, is used to represent a silence in a communication. One exclamation mark represents a silence of 1 second. The 46 characters starting from the quotation mark included up to the \textit{O} character included are used to describe one direction of a communication. The 46 characters starting from the \textit{P} character included up to the tilde character included are used to describe the other direction of a communication.
+The very first character, exclamation mark, is used to represent a silence in a communication. One exclamation mark represents a silence of 1 second. The 46 characters starting from the quotation mark included up to the \textit{O} character included are used to describe one direction of a communication. The 46 characters starting from the \textit{P} character included up to the tilde character included are used to describe the other direction of a communication. The meaning of transcription characters is captured in a tabular form in the table \ref{tab:character-meanings}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ |p{0.35\linewidth} | p{0.6\linewidth}| }
+ \hline
+ Character & Meaning \\
+ \hline \hline
+ ! & Silence in a communication of 1s time period. \\
+ \hline
+ " up to O & A packet sent from host A to host B. Each of these characters represents different packet length bucket. \\
+ \hline
+ P up to $\sim$ & A packet sent from host B to host A. Each of these characters represents different packet length bucket. \\
+ \hline
+\end{tabular}
+\caption{Meaning of transcription characters}
+\label{tab:character-meanings}
+\end{table}
 
 Based on the research in the section \ref{sec-dataset-exploration} we utilized the characters in such way that the characters represent different bins of packet lengths. We reasonably chose binning based on the analysis of the figure \ref{fig-cdf-packet-sizes}. We encoded the packets of lengths $<= 2^{14}$ with first 30 characters, the packets of lengths $(2^{14}; 2^{16}]$ with the next 15 characters and the packets of lengths $> 2^{16}$ with the last (46th) character. Naturally, each communication direction utilizes its own character set as described in the section \ref{sec-dataset-exploration}. In every category the bins are of the same size. Meaning, in the first category there are 30 bins of the same size, in the second category there are 15 bins of the same size and in the last category there is just one bin.
+
+
+An example transcription may look like this:
+
+$$ CCn!D!n $$
+
+The meaning of the transcription character by character is the following:
+
+\begin{enumerate}
+    \item C -- host A sent a packet of length between 8752B up to 9298B
+    \item C -- host A sent a packet of length between 8752B up to 9298B
+    \item n -- host B sent a packet of length between 15863B up to 16384B
+    \item ! -- 1s of communication silence
+    \item D -- host A sent a packet of length between 9299B up to 9846B
+    \item ! -- 1s of communication silence
+    \item n -- host B sent a packet of length between 15863B up to 16384B
+\end{enumerate}
 
 %-------------------------------------------------------
 
@@ -102,10 +145,11 @@ Transcription maker filters the TCP packets from the input CSV file and subseque
 The final structure of the output TSV file is the following: \textit{srcIP, dstIP, transcription}. If a file with labels assigned to the network flows was specified, the output TSV file additionally contains one more column -- \textit{label}. Label is a binary label indicating whether a flow is attack or not.
 
 
-\subsection{Testing}
-For the testing purposes I decided to train Random Forest on top of bag of words. The goal was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of the whole test set is meaningless for us as our data set is imbalanced and therefore overall accuracy may distort results.
+\section{Testing}
 
-We used a very simple bag of words technique. For each entry of the data set (a transcription) we counted number of each word in a particular transcription. Basically, we transformed our data set of transcriptions to the data set where our dimensions represented the word counts in transcriptions. For better understanding, see an example at figure \ref{fig-bag-of-words-example}.
+For the testing purposes we always decided to learn Random Forest on top of bag of words for the transcription datasets comparing it to baseline Random Forest models on top of numeric vectrs representing the flows using the same features as those which were used for building transcriptions. The goal was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of the whole test set is meaningless for us as our data set is imbalanced and therefore overall accuracy may distort results.
+
+We used a simple bag of words technique to express our transcription strings as numeric vectors. For each entry of the data set (a transcription) we counted number of each word in the transcription. Basically, we transformed our data set of transcriptions to the data set where our dimensions represented the word counts in transcriptions. For better understanding, see an example at figure \ref{fig-bag-of-words-example}.
 
 \begin{figure}[h!]
 \centering
@@ -132,44 +176,77 @@ We used a very simple bag of words technique. For each entry of the data set (a 
 \label{fig-bag-of-words-example}
 \end{figure}
 
-We did two testing experiments. In both of them we trained a Random Forest model on top of the bag of words data set. In the first our training set consisted of $1\ 600$ non-attacks and 262 attacks. Since the classes were imbalanced in a certain ratio, we used this ratio to simulate the balance between the two classes. We put 8-times higher weight on attacks than on non-attacks during the model training phase.
 
-Second, we trained another Random Forest model on top of bag words data set. However, this time we used $16\ 000$ non-attacks and the same number of attacks as before -- 262. As the ratio of number of samples between the two classes increased from 8:1 to 80:1, we also adjusted the class weights and therefore we put 80-times higher weight on attacks than on non-attacks during the model training phase.
+\subsection{Experiment 1}
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.85\textwidth]{final-report/img/8-1_confusion-matrix-absolute.png}
-    \caption{Confusion matrix with absolute values for the first testing experiment}
-    \label{fig-8-1-absolute}
-\end{figure}
+For this experiment we used the Friday's CIC-IDS 2017 data. We were performing binary classification deciding between attack and non-attack communications. We extracted the network flows from the pcap file using go-flows. This was done using key features \textit{sourceIPAddress} and \textit{destinationIPAddress}. Next, we used \textit{active\textunderscore timeout} as well as \textit{idle\textunderscore timeout} equal to 60. This set up extracted altogether $73\ 726$ flows out of which $192$ are attack flows.
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.85\textwidth]{final-report/img/8-1_confusion-matrix-normalized.png}
-    \caption{Confusion matrix with normalized values for the first testing experiment}
-    \label{fig-8-1-normalized}
-\end{figure}
+We sampled $5\ 500$ non-attack entries from this dataset and used all attacks from this dataset. This makes altogether a dataset of $5\ 692$ entries. We split both attacks and non-attacks in the 70:30 ratio of train to test set. Then we merge non-attacks with attacks for both train and test data separately in order to create a single train set and a single test set.
+
+Learning a Random Forest model on top of bag of words created from the transcriptions and predicting the test set entries gives us very promising results as we can see at Figure \ref{fig-friday-rf-normalized} and Table \ref{tab-friday-rf-absolute}.
+
+Even though the class imbalance was huge, we experimented with different sample weights trying to put higher weight on attack entries as there were too few of them present in the dataset, but it turned out that the best performing model is the one using the same sample weight for both.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.85\textwidth]{final-report/img/80-1_confusion-matrix-absolute.png}
-    \caption{Confusion matrix with absolute values for the second testing experiment}
-    \label{fig-80-1-absolute}
+    \includegraphics[width=0.85\textwidth]{final-report/img/friday/friday-rf-normalized.png}
+    \caption{Confusion matrix with normalized values for the experiment 1}
+    \label{fig-friday-rf-normalized}
 \end{figure}
 
 \begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.85\textwidth]{final-report/img/80-1_confusion-matrix-normalized.png}
-    \caption{Confusion matrix with normalized values for the second testing experiment}
-    \label{fig-80-1-normalized}
+\centering
+\begin{tabular}{ |c|c|c|c|c|c|c| }
+ \hline
+  & true non-attack & true attack \\
+ \hline
+ predicted non-attack & 1635 & 15 \\
+ \hline
+ predicted attack & 12 & 46 \\
+ \hline
+\end{tabular}
+\caption{Confusion matrix with absolute values for the experiment 1}
+\label{tab-friday-rf-absolute}
 \end{figure}
 
-The confusion matrices in figures \ref{fig-8-1-absolute}, \ref{fig-8-1-normalized}, \ref{fig-80-1-absolute}, \ref{fig-80-1-normalized} clearly show that the Random Forest model predicts non-attacks with very high precision ($98\%$ and $98,8\%$ non-attacks are classified correctly).
-On the other hand, attacks are classified with quite poor precision, but at least some of then are detected ($13,6\%$ and $10,6\%$ of attacks are classified correctly). This means that there are a lot of false negatives in the attacks class.
+\textbf{Baseline Model}\\
+TODO Spravit a popisat performance baseline modelu\\
 
 
 
 % describe the results that I got (the confusion matrix, accuracy etc). Next describe how I constructed the train and test data set, how many entries the train and test data set contain
+
+
+\subsection{Experiment 2}
+This experiment has completely the same configuration as the experiment 1 with a difference of the used dataset. In the experiment 1 we worked with CIC-IDS 2017 Friday dataset. Here we are working with CIC-IDS 2017 Wednesday dataset.
+
+The dataset contains $80\ 716$ entries out of which only 54 are attacks. We sampled $5\ 500$ non attack entries from this file for the sake of our experiment and we kept all 54 attacks. The train to test set was split in 70:30 ratio resulting in $3\ 850$ non attacks and 37 attacks in the train set and 1650 non attacks and 17 attacks in the test set.
+
+The normalized confusion matrix in Figure \ref{fig-thursday-rf-normalized} again shows promising results. The absolute values are displayed in Table \ref{tab-thursday-rf-absolute}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{final-report/img/friday/friday-rf-normalized.png}
+    \caption{Confusion matrix with normalized values for the experiment 1}
+    \label{fig-thursday-rf-normalized}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\begin{tabular}{ |c|c|c|c|c|c|c| }
+ \hline
+  & true non-attack & true attack \\
+ \hline
+ predicted non-attack & 1645 & 5 \\
+ \hline
+ predicted attack & 3 & 14 \\
+ \hline
+\end{tabular}
+\caption{Confusion matrix with absolute values for the experiment 1}
+\label{tab-thursday-rf-absolute}
+\end{figure}
+
+
 
 
 \clearpage
