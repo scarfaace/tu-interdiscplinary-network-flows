@@ -67,7 +67,7 @@ X_test_words = vectorizer.transform(X_test.values.astype('U'))
 
 #%%
 # model = LogisticRegression()
-sample_weight = np.array([8 if i == 1 else 1 for i in y_train])
+sample_weight = np.array([1 if i == 1 else 1 for i in y_train])
 model = RandomForestClassifier(random_state=20)
 model.fit(X_train_words, y_train, sample_weight=sample_weight)
 print("Train set score: {:.3f}".format(model.score(X_train_words, y_train)))
