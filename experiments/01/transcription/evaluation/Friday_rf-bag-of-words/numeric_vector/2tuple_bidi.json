@@ -1,0 +1,50 @@
+{
+	"version": "v2",
+	"preprocessing": {
+		"flows": [{
+			"active_timeout": 60,
+    		"idle_timeout": 60,
+			"features": [
+				"flowStartMilliseconds",
+				"flowDurationMilliseconds",
+				"sourceIPAddress",
+				"destinationIPAddress",
+    			{"apply": ["packetTotalCount", "forward"]},
+				{"apply": [{"min":["ipTotalLength"]}, "forward"]},
+				{"apply": [{"max":["ipTotalLength"]}, "forward"]},
+				{"apply": [{"median":["ipTotalLength"]}, "forward"]},
+				{"apply": [{"mean":["ipTotalLength"]}, "forward"]},
+				{"apply": [{"mode":["ipTotalLength"]}, "forward"]},
+				{"apply": [{"stdev":["ipTotalLength"]}, "forward"]},
+				{"apply": [{"min":["_interPacketTimeSeconds"]}, "forward"]},
+				{"apply": [{"max":["_interPacketTimeSeconds"]}, "forward"]},
+				{"apply": [{"median":["_interPacketTimeSeconds"]}, "forward"]},
+				{"apply": [{"mean":["_interPacketTimeSeconds"]}, "forward"]},
+				{"apply": [{"variance":["_interPacketTimeSeconds"]}, "forward"]},
+				{"apply": ["packetTotalCount", "backward"]},
+				{"apply": [{"min":["ipTotalLength"]}, "backward"]},
+				{"apply": [{"max":["ipTotalLength"]}, "backward"]},
+				{"apply": [{"median":["ipTotalLength"]}, "backward"]},
+				{"apply": [{"mean":["ipTotalLength"]}, "backward"]},
+				{"apply": [{"mode":["ipTotalLength"]}, "backward"]},
+				{"apply": [{"stdev":["ipTotalLength"]}, "backward"]},
+				{"apply": [{"min":["_interPacketTimeSeconds"]}, "backward"]},
+				{"apply": [{"max":["_interPacketTimeSeconds"]}, "backward"]},
+				{"apply": [{"median":["_interPacketTimeSeconds"]}, "backward"]},
+				{"apply": [{"mean":["_interPacketTimeSeconds"]}, "backward"]},
+				{"apply": [{"variance":["_interPacketTimeSeconds"]}, "backward"]},
+				{"min":["_interPacketTimeSeconds"]},
+				{"max":["_interPacketTimeSeconds"]},
+				{"median":["_interPacketTimeSeconds"]},
+				{"mean":["_interPacketTimeSeconds"]},
+				{"variance":["_interPacketTimeSeconds"]}
+			],
+
+			"bidirectional": true,
+			"key_features": [
+				"sourceIPAddress",
+				"destinationIPAddress"
+			]
+		}]
+	}
+}
