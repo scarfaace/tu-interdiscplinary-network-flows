@@ -63,7 +63,10 @@ As \cite{oreilly-tcp} states, the minimum size of a TCP/IP packet is 21 bytes an
 
 
 %-------------------------------------------------------
-\subsection{Schema Description}\label{sec-schema}
+\subsection{Transcription Schema Description}\label{sec-schema}
+
+\subsubsection{Feature extraction}
+
 Our transcription schema utilizes several network flow features. Among these are also the features that determine how output transcription schema will look like. These are:
 
 \begin{itemize}
@@ -72,13 +75,16 @@ Our transcription schema utilizes several network flow features. Among these are
     \item \textit{inter packet time}.
 \end{itemize}
 
-The first two are used because they are obvious and can easily help us with providing more information about the flows. The 3rd one, \textit{packet timestamp}, is used for multiple purposes. The first one is present to help our transcription maker determine when we should stop the transcription making process and cut off network flows. Once 1 minute elapses since the beginning of a network flow, we ignore this flow for the rest of the time. The second reason is that we decide the communication silences based on the time differences of two consecutive packets.
+These three are basic features that can be easily extracted from both encrypted communication and non-encrypted network communication. Moreover, the results from the research \cite{meghdouri2018analysis} show that packet length based features are a decisive factor for identifying malicious activity.
 
-We use the \textit{packet length} feature because among the other mentioned features, this is also one that we can find in an encrypted communication as well as in a non-encrypted communication. We also used this feature as the results from the research \cite{meghdouri2018analysis} show that packet length based features are a decisive factor for identifying malicious activity.
+
+% The first two are used because they are obvious and can easily help us with providing more information about the flows. The 3rd one is used for multiple purposes. The second reason is that we decide the communication silences based on the time differences of two consecutive packets.
 
 % The output of our data processing pipeline is a tsv file with four columns -- Source IP, Destination IP, Attack, Transcription. The IP addresses represent the communication endpoints. The Attack attribute contains a binary information whether the network flow is an attack or not. The Transcription attribute contains the transcription itself.
 
-The transcription is a string of characters describing a network flow. We use 93 characters to describe flows by transcriptions. These are printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) where each character represents a captured packet length. Each character represents different packet lengths. Transcription string characters are ordered in the same chronological order as the packet captures.
+\subsubsection{Transcriptions}
+
+A transcription is a string of characters describing a network flow. We use 93 characters to for constructing a transcription string. These are printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) where each character represents a captured packet length. Each character represents different packet lengths. Transcription string characters are ordered in the same chronological order as the packet captures.
 
 The very first character, exclamation mark, is used to represent a silence in a communication. One exclamation mark represents a silence of 1 second. The 46 characters starting from the quotation mark included up to the \textit{O} character included are used to describe one direction of a communication. The 46 characters starting from the \textit{P} character included up to the tilde character included are used to describe the other direction of a communication. The meaning of transcription characters is captured in a tabular form in the table \ref{tab:character-meanings}.
 
