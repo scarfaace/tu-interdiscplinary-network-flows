@@ -9,7 +9,6 @@
 				"flowDurationMilliseconds",
 				"sourceIPAddress",
 				"destinationIPAddress",
-    			{"apply": ["packetTotalCount", "forward"]},
 				{"apply": [{"min":["ipTotalLength"]}, "forward"]},
 				{"apply": [{"max":["ipTotalLength"]}, "forward"]},
 				{"apply": [{"median":["ipTotalLength"]}, "forward"]},
@@ -20,8 +19,7 @@
 				{"apply": [{"max":["_interPacketTimeSeconds"]}, "forward"]},
 				{"apply": [{"median":["_interPacketTimeSeconds"]}, "forward"]},
 				{"apply": [{"mean":["_interPacketTimeSeconds"]}, "forward"]},
-				{"apply": [{"variance":["_interPacketTimeSeconds"]}, "forward"]},
-				{"apply": ["packetTotalCount", "backward"]},
+				{"apply": [{"stdev":["_interPacketTimeSeconds"]}, "forward"]},
 				{"apply": [{"min":["ipTotalLength"]}, "backward"]},
 				{"apply": [{"max":["ipTotalLength"]}, "backward"]},
 				{"apply": [{"median":["ipTotalLength"]}, "backward"]},
@@ -32,12 +30,12 @@
 				{"apply": [{"max":["_interPacketTimeSeconds"]}, "backward"]},
 				{"apply": [{"median":["_interPacketTimeSeconds"]}, "backward"]},
 				{"apply": [{"mean":["_interPacketTimeSeconds"]}, "backward"]},
-				{"apply": [{"variance":["_interPacketTimeSeconds"]}, "backward"]},
+				{"apply": [{"stdev":["_interPacketTimeSeconds"]}, "backward"]},
 				{"min":["_interPacketTimeSeconds"]},
 				{"max":["_interPacketTimeSeconds"]},
 				{"median":["_interPacketTimeSeconds"]},
 				{"mean":["_interPacketTimeSeconds"]},
-				{"variance":["_interPacketTimeSeconds"]}
+				{"stdev":["_interPacketTimeSeconds"]}
 			],
 
 			"bidirectional": true,
