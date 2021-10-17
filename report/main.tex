@@ -145,7 +145,7 @@ The final structure of the output TSV file is the following: \textit{srcIP, dstI
 
 \section{Testing}
 
-\noindent\textbf{Transcription Dataset}
+\noindent\textbf{Transcriptions Dataset}
 
 For the testing purposes we always decided to train a Random Forest on top of bag of words for the transcription datasets comparing it to a baseline Random Forest models on top of numeric vectors representing the flows using the same features as those which were used for building transcriptions. The goal was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of the whole test set is meaningless for us as our data set is imbalanced and therefore overall accuracy may distort results.
 
@@ -179,7 +179,7 @@ We used a simple bag of words technique to express our transcription strings as 
 
 \noindent\textbf{Baseline Model}
 
-For a baseline model we chose to train Random Forest models as well but on top of a different data set. We aggregated several network flow features in order to create a data set of numeric vectors. We used the very same network flow features for constructing these numeric vectors as the ones that we used for constructing the transcriptions. These are:
+For a baseline model we chose to train Random Forest models as well but on top of a different data set. We aggregated several network flow features in order to create a data set of numeric vectors. We used the very same network flow features for constructing these numeric vectors as the ones that we used for constructing the transcriptions. These features are:
 
 \begin{itemize}
     \item \textit{packet length},
@@ -213,7 +213,7 @@ Even though the class imbalance was huge, we experimented with different sample 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.85\textwidth]{final-report/img/friday/friday-rf-normalized.png}
+    \includegraphics[width=0.75\textwidth]{final-report/img/friday/friday-rf-normalized.png}
     \caption{Confusion matrix with normalized values for the experiment 1}
     \label{fig-friday-rf-normalized}
 \end{figure}
@@ -233,9 +233,28 @@ Even though the class imbalance was huge, we experimented with different sample 
 \label{tab-friday-rf-absolute}
 \end{figure}
 
-\textbf{Baseline Model}\\
+\vspace{0.5cm}
+\noindent\textbf{Baseline Model}
+
 TODO Spravit a popisat performance baseline modelu\\
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{final-report/img/friday/friday-baseline-normalized.png}
+
+    \centering
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 1635 & 15 \\
+     \hline
+     predicted attack & 12 & 46 \\
+     \hline
+    \end{tabular}
+    \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 1}
+    \label{fig-exp1-baseline}
+\end{figure}
 
 
 % describe the results that I got (the confusion matrix, accuracy etc). Next describe how I constructed the train and test data set, how many entries the train and test data set contain
@@ -246,28 +265,24 @@ This experiment has completely the same configuration as the experiment 1 with a
 
 The dataset contains $80\ 716$ entries out of which only 54 are attacks. We sampled $5\ 500$ non attack entries from this file for the sake of our experiment and we kept all 54 attacks. The train to test set was split in 70:30 ratio resulting in $3\ 850$ non attacks and 37 attacks in the train set and 1650 non attacks and 17 attacks in the test set.
 
-The normalized confusion matrix in Figure \ref{fig-thursday-rf-normalized} again shows promising results. The absolute values are displayed in Table \ref{tab-thursday-rf-absolute}.
+The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promising results.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.85\textwidth]{final-report/img/friday/friday-rf-normalized.png}
-    \caption{Confusion matrix with normalized values for the experiment 1}
-    \label{fig-thursday-rf-normalized}
-\end{figure}
+    \includegraphics[width=0.75\textwidth]{final-report/img/friday/friday-rf-normalized.png}
 
-\begin{figure}[h!]
-\centering
-\begin{tabular}{ |c|c|c|c|c|c|c| }
- \hline
-  & true non-attack & true attack \\
- \hline
- predicted non-attack & 1645 & 5 \\
- \hline
- predicted attack & 3 & 14 \\
- \hline
-\end{tabular}
-\caption{Confusion matrix with absolute values for the experiment 1}
-\label{tab-thursday-rf-absolute}
+    \centering
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 1645 & 5 \\
+     \hline
+     predicted attack & 3 & 14 \\
+     \hline
+    \end{tabular}
+    \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 1}
+    \label{fig-exp2-transcriptions}
 \end{figure}
 
 
