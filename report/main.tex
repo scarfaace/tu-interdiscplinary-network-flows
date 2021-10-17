@@ -67,10 +67,9 @@ As \cite{oreilly-tcp} states, the minimum size of a TCP/IP packet is 21 bytes an
 Our transcription schema utilizes several network flow features. Among these are also the features that determine how output transcription schema will look like. These are:
 
 \begin{itemize}
-    \item \textit{communication direction},
-    \item \textit{communication silence},
-    \item \textit{packet timestamp},
-    \item \textit{packet length}.
+    \item \textit{packet length},
+    \item \textit{flow direction},
+    \item \textit{inter packet time}.
 \end{itemize}
 
 The first two are used because they are obvious and can easily help us with providing more information about the flows. The 3rd one, \textit{packet timestamp}, is used for multiple purposes. The first one is present to help our transcription maker determine when we should stop the transcription making process and cut off network flows. Once 1 minute elapses since the beginning of a network flow, we ignore this flow for the rest of the time. The second reason is that we decide the communication silences based on the time differences of two consecutive packets.
@@ -102,12 +101,11 @@ The very first character, exclamation mark, is used to represent a silence in a 
 
 Based on the research in the section \ref{sec-dataset-exploration} we utilized the characters in such way that the characters represent different bins of packet lengths. We reasonably chose binning based on the analysis of the figure \ref{fig-cdf-packet-sizes}. We encoded the packets of lengths $<= 2^{14}$ with first 30 characters, the packets of lengths $(2^{14}; 2^{16}]$ with the next 15 characters and the packets of lengths $> 2^{16}$ with the last (46th) character. Naturally, each communication direction utilizes its own character set as described in the section \ref{sec-dataset-exploration}. In every category the bins are of the same size. Meaning, in the first category there are 30 bins of the same size, in the second category there are 15 bins of the same size and in the last category there is just one bin.
 
-
-An example transcription may look like this:
+\noindent An example transcription may look like this:
 
 $$ CCn!D!n $$
 
-The meaning of the transcription character by character is the following:
+\noindent The meaning of the transcription character by character is the following:
 
 \begin{enumerate}
     \item C -- host A sent a packet of length between 8752B up to 9298B
@@ -147,7 +145,9 @@ The final structure of the output TSV file is the following: \textit{srcIP, dstI
 
 \section{Testing}
 
-For the testing purposes we always decided to learn Random Forest on top of bag of words for the transcription datasets comparing it to baseline Random Forest models on top of numeric vectrs representing the flows using the same features as those which were used for building transcriptions. The goal was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of the whole test set is meaningless for us as our data set is imbalanced and therefore overall accuracy may distort results.
+\noindent\textbf{Transcription Dataset}
+
+For the testing purposes we always decided to train a Random Forest on top of bag of words for the transcription datasets comparing it to a baseline Random Forest models on top of numeric vectors representing the flows using the same features as those which were used for building transcriptions. The goal was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of the whole test set is meaningless for us as our data set is imbalanced and therefore overall accuracy may distort results.
 
 We used a simple bag of words technique to express our transcription strings as numeric vectors. For each entry of the data set (a transcription) we counted number of each word in the transcription. Basically, we transformed our data set of transcriptions to the data set where our dimensions represented the word counts in transcriptions. For better understanding, see an example at figure \ref{fig-bag-of-words-example}.
 
@@ -175,6 +175,30 @@ We used a simple bag of words technique to express our transcription strings as 
 \caption{Data set of transcriptions (on top) and bag of words data set (bottom)}
 \label{fig-bag-of-words-example}
 \end{figure}
+
+
+\noindent\textbf{Baseline Model}
+
+For a baseline model we chose to train Random Forest models as well but on top of a different data set. We aggregated several network flow features in order to create a data set of numeric vectors. We used the very same network flow features for constructing these numeric vectors as the ones that we used for constructing the transcriptions. These are:
+
+\begin{itemize}
+    \item \textit{packet length},
+    \item \textit{flow direction},
+    \item \textit{inter packet time}.
+\end{itemize}
+
+\noindent On top of these features we used the following aggregation functions:
+
+\begin{itemize}
+    \item \textit{min},
+    \item \textit{max},
+    \item \textit{median},
+    \item \textit{mean},
+    \item \textit{mode},
+    \item \textit{stdev}.
+\end{itemize}
+
+\noindent To be more precise, for each flow direction (forward/backward) we used each of these functions on top of the \textit{packet length} and \textit{inter packet time} features.
 
 
 \subsection{Experiment 1}
