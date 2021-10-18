@@ -34,7 +34,7 @@ pcap2transcription \cite{pcap2transcription} is a preliminary project that tries
 \section{Methodology}
 \subsection{Data}
 % describe what data set I was working with (CIC2017 IDS dataset (synthetic labeled)
-For the purpose of our experiments we used the synthetic CIC IDS 2017 dataset \cite{sharafaldin2018toward}. The dataset contains pcap files and labels of the network flows. The labels are binary -- attack and non-attack.
+For the purpose of our experiments we used the synthetic CIC IDS 2017 data set \cite{sharafaldin2018toward}. The data set contains pcap files and labels of the network flows. The labels are binary -- attack and non-attack.
 
 There are 5 different pcap files in this data set. Each of them represents a different day in the week from Monday to Friday. The size of all of them vary from 7GB up to 14GB.\\
 
@@ -45,12 +45,12 @@ There are 5 different pcap files in this data set. Each of them represents a dif
 %-------------------------------------------------------
 \subsection{Data Exploration}\label{sec-dataset-exploration}
 % describe what I found in data -- show the charts from the 1st and 2nd report for Felix, describe these findings and later
-Since the beginning we decided to work with several network flow features -- protocol identifier, packet length, communication gaps (communication silence), communication direction, packet timestamp. Based on this decision we researched our dataset to find out more about these features and to drive our decisions later based on our findings.
+Since the beginning we decided to work with several network flow features -- protocol identifier, packet length, communication gaps (communication silence), communication direction, packet timestamp. Based on this decision we researched our data set to find out more about these features and to drive our decisions later based on our findings.
 
 The protocol identifier was purely used for identification whether a packet is a TCP/IP packet or not. If it is not a TCP/IP packet, then, as the name of the project suggests, we do not care about the packet. If it is a TCP/IP packet, we work with that.
 
 \subsubsection{Packet Size}
-As \cite{oreilly-tcp} states, the minimum size of a TCP/IP packet is 21 bytes and the maximum size of such packet is $65\ 535$ bytes. We analysed the cumulative distribution function (CDF) of packet sizes of the packets in our dataset. The output of our analysis is the figure \ref{fig-cdf-packet-sizes}. The figure provides us with information of what percentage of packets have size less than or equal to a certain value. The figure shows us that almost all of the packet sizes are less than or equal to 5kB.
+As \cite{oreilly-tcp} states, the minimum size of a TCP/IP packet is 21 bytes and the maximum size of such packet is $65\ 535$ bytes. We analysed the cumulative distribution function (CDF) of packet sizes of the packets in our data set. The output of our analysis is the figure \ref{fig-cdf-packet-sizes}. The figure provides us with information of what percentage of packets have size less than or equal to a certain value. The figure shows us that almost all of the packet sizes are less than or equal to 5kB.
 
 \begin{figure}[h!]
     \centering
@@ -125,9 +125,18 @@ $$ CCn!D!n $$
 
 %-------------------------------------------------------
 
-\subsection{Output Data Set}
+\subsection{Output Data Set}\label{sec-output-dataset}
 
-The output data set built from pcap files is a TSV file. The basic file structure is \textit{srcIP, dstIP, transcription}. The advanced file structure which contains also labels for network flows contains \textit{label} attribute alongside the 3 mentioned attributes. An end-user will receive a file of the basic structure if no file containing labels is specified. If such file is specified, the program tries to look up a label for each flow and assign a label and a type of attack to each entry of the output data set.
+The output data set built from pcap files is a TSV file. Such structured TSV file contains 5 features. These are:
+\begin{itemize}
+    \item \textit{flowStartMilliseconds} -- flow start in milliseconds,
+    \item \textit{flowDurationMilliseconds} - flow duration in milliseconds,
+    \item \textit{sourceIPAddress} -- source IP address of a flow,
+    \item \textit{destinationIPAddress} -- destination IP address of a flow,
+    \item \textit{transcription} -- the transcription itself.
+\end{itemize}
+
+
 
 %-------------------------------------------------------
 
@@ -137,10 +146,30 @@ The output data set built from pcap files is a TSV file. The basic file structur
 
 \subsubsection{Data Processing Pipeline}
 The software for processing the \textit{pcap} files and converting network flows into sentence-like transcriptions is a data processing pipeline consisted of two steps. The two-step process consists of extracting the necessary features from a \textit{pcap} file with \textit{go-flows} software \cite{goflows-reference} and the 2nd step is the transcriptions building process itself based on the output from the 1st step. The data processing pipeline itself is a shell script that orchestrates the steps to be done in order to achieve the final output. The shell pipeline is located in \verb|/transcription/pipeline.sh|.
+TODO: fix shell pipeline path
+
+
+\subsubsection{go-flows Features Extraction}
+TODO maybe write what we extract from go-flows??
+First step of data processing pipeline is extracting features from a pcap file using go-flows. go-flows uses a configuration file which describes what features we want to extract from a pcap. The configuration file for go-flows used in our data processing pipeline is located in \verb|/transcription/feature_extraction/pcap2pkts.json|. This configuration file makes go-flows produce a CSV file containing network flows with following features:
+
+\begin{itemize}
+    \item \textit{flowStartMilliseconds} -- beginning of a flow timestamp in ms,
+    \item \textit{flowDurationMilliseconds} -- flow duration in ms,
+    \item \textit{sourceIPAddress} -- source IP address of a flow,
+    \item \textit{destinationIPAddress} -- destination IP address of a flow,
+    \item \textit{packetTotalCount} -- the total count of packets in the flow,
+    \item \textit{accumulate(ipTotalLength)} -- accumulated lengths of packets,
+    \item \textit{accumulate(\textunderscore interPacketTimeMilliseconds)} -- accumulated inter packet times in ms,
+    \item \textit{accumulate(flowDirection)} -- accumulated flow directions related to packets.
+\end{itemize}
+
+
+of the following header structure: \textit{flowStartMilliseconds, protocolIdentifier, sourceIPAddress, destinationIPAddress, ipTotalLength}. Since we are dealing with packets, the \textit{flowStartMilliseconds} attribute represents a timestamp of a packet. The \textit{ipTotalLength} attribute represents a size of a IP packet itself. The other attributes are self-explaining.
 
 
 \subsubsection{Transcriptions Maker}
-As mentioned above, the 2nd step of the data processing pipeline is the transcriptions building process. This is the core software of this project implemented in Python expecting a CSV file of a certain structure as an input and producing a TSV file containing the sentence-like transcriptions as the output. Let's call this software the transcription maker.
+As mentioned above, the 2nd step of the data processing pipeline is the transcriptions building process. This is the core software of this project implemented in Python expecting a CSV file of a certain structure as an input and producing a TSV file containing the sentence-like transcriptions as the output among other features described in the Section \ref{sec-output-dataset}. Let's call this software the transcription maker.
 
 The input CSV file for this core software is an output produced from go-flows. The configuration file used for go-flows is located in \verb|/transcription/feature_extraction/pcap2pkts.json|. This configuration file makes go-flows produce a CSV file of the following header structure: \textit{flowStartMilliseconds, protocolIdentifier, sourceIPAddress, destinationIPAddress, ipTotalLength}. Since we are dealing with packets, the \textit{flowStartMilliseconds} attribute represents a timestamp of a packet. The \textit{ipTotalLength} attribute represents a size of a IP packet itself. The other attributes are self-explaining.
 
@@ -151,9 +180,9 @@ The final structure of the output TSV file is the following: \textit{srcIP, dstI
 
 \section{Testing}
 
-\noindent\textbf{Transcriptions Dataset}
+\noindent\textbf{Transcriptions Data Set}
 
-For the testing purposes we always decided to train a Random Forest on top of bag of words for the transcription datasets comparing it to a baseline Random Forest models on top of numeric vectors representing the flows using the same features as those which were used for building transcriptions. The goal was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of the whole test set is meaningless for us as our data set is imbalanced and therefore overall accuracy may distort results.
+For the testing purposes we always decided to train a Random Forest on top of bag of words for the transcription data sets comparing it to a baseline Random Forest models on top of numeric vectors representing the flows using the same features as those which were used for building transcriptions. The goal was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of the whole test set is meaningless for us as our data set is imbalanced and therefore overall accuracy may distort results.
 
 We used a simple bag of words technique to express our transcription strings as numeric vectors. For each entry of the data set (a transcription) we counted number of each word in the transcription. Basically, we transformed our data set of transcriptions to the data set where our dimensions represented the word counts in transcriptions. For better understanding, see an example at figure \ref{fig-bag-of-words-example}.
 
@@ -185,7 +214,7 @@ We used a simple bag of words technique to express our transcription strings as 
 
 \noindent\textbf{Baseline Model}
 
-For a baseline model we chose to train Random Forest models as well but on top of a different data set. We aggregated several network flow features in order to create a data set of numeric vectors. We used the very same network flow features for constructing these numeric vectors as the ones that we used for constructing the transcriptions. These features are:
+\noindent For a baseline model we chose to train Random Forest models as well but on top of a different data set. We aggregated several network flow features in order to create a data set of numeric vectors. We used the very same network flow features for constructing these numeric vectors as the ones that we used for constructing the transcriptions. These features are:
 
 \begin{itemize}
     \item \textit{packet length},
@@ -193,7 +222,7 @@ For a baseline model we chose to train Random Forest models as well but on top o
     \item \textit{inter packet time}.
 \end{itemize}
 
-\noindent On top of these features we used the following aggregation functions:
+\noindent For each \textit{flow direction} (forward/backward) we used each of these aggregation functions on top of the \textit{packet length} and \textit{inter packet time} features:
 
 \begin{itemize}
     \item \textit{min},
@@ -204,18 +233,17 @@ For a baseline model we chose to train Random Forest models as well but on top o
     \item \textit{stdev}.
 \end{itemize}
 
-\noindent To be more precise, for each flow direction (forward/backward) we used each of these functions on top of the \textit{packet length} and \textit{inter packet time} features.
 
 
 \subsection{Experiment 1}
 
 For this experiment we used the Friday's CIC-IDS 2017 data. We were performing binary classification deciding between attack and non-attack communications. We extracted the network flows from the pcap file using go-flows. This was done using key features \textit{sourceIPAddress} and \textit{destinationIPAddress}. Next, we used \textit{active\textunderscore timeout} as well as \textit{idle\textunderscore timeout} equal to 60. This set up extracted altogether $73\ 726$ flows out of which $192$ are attack flows.
 
-We sampled $5\ 500$ non-attack entries from this dataset and used all attacks from this dataset. This makes altogether a dataset of $5\ 692$ entries. We split both attacks and non-attacks in the 70:30 ratio of train to test set. Then we merge non-attacks with attacks for both train and test data separately in order to create a single train set and a single test set.
+We sampled $5\ 500$ non-attack and used all attacks from this data set. This makes altogether a data set of $5\ 692$ entries. We split both attacks and non-attacks in the 70:30 ratio of train to test set. Then we merge non-attacks with attacks for both train and test data separately in order to create a single train set and a single test set.
 
-Learning a Random Forest model on top of bag of words created from the transcriptions and predicting the test set entries gives us very promising results as we can see at Figure \ref{fig-friday-rf-normalized} and Table \ref{tab-friday-rf-absolute}.
+Training a Random Forest model on top of bag of words created from the transcriptions and predicting the test set entries gives us very promising results as we can see at Figure \ref{fig-friday-rf-normalized} and Table \ref{tab-friday-rf-absolute}.
 
-Even though the class imbalance was huge, we experimented with different sample weights trying to put higher weight on attack entries as there were too few of them present in the dataset, but it turned out that the best performing model is the one using the same sample weight for both.
+Even though the class imbalance was huge, we experimented with different sample weights trying to put higher weight on attack entries as there were too few of them present in the data set, but it turned out that the best performing model is the one using the same sample weight for both.
 
 \begin{figure}[h!]
     \centering
@@ -239,10 +267,13 @@ Even though the class imbalance was huge, we experimented with different sample 
 \label{tab-friday-rf-absolute}
 \end{figure}
 
+
 \vspace{0.5cm}
 \noindent\textbf{Baseline Model}
 
-TODO Spravit a popisat performance baseline modelu\\
+\noindent We didn't necessarily train and test our baseline model on exactly the same train and test network flows as we did for the model on top of transcriptions data. Nevertheless, we subsampled from the same sets of network flows which minimizes the impact of not using the same network flows for training and testing the models. The counts for train and test sets are exactly the same as for the first part of this experiment.
+
+In this case we achieved better results than for the model trained and tested on top of the transcriptions data set. The results are captured in the Figure \ref{fig-exp1-baseline}.
 
 \begin{figure}[h!]
     \centering
@@ -267,15 +298,15 @@ TODO Spravit a popisat performance baseline modelu\\
 
 
 \subsection{Experiment 2}
-This experiment has completely the same configuration as the experiment 1 with a difference of the used dataset. In the experiment 1 we worked with CIC-IDS 2017 Friday dataset. Here we are working with CIC-IDS 2017 Wednesday dataset.
+This experiment has completely the same configuration as the experiment 1 with a difference of the used data set. In the experiment 1 we worked with CIC-IDS 2017 Friday data set. Here we are working with CIC-IDS 2017 Wednesday data set.
 
-The dataset contains $80\ 716$ entries out of which only 54 are attacks. We sampled $5\ 500$ non attack entries from this file for the sake of our experiment and we kept all 54 attacks. The train to test set was split in 70:30 ratio resulting in $3\ 850$ non attacks and 37 attacks in the train set and 1650 non attacks and 17 attacks in the test set.
+The data set contains $80\ 716$ entries out of which only 54 are attacks. We sampled $5\ 500$ non attack entries from this file for the sake of our experiment and we kept all 54 attacks. The train to test set was split in 70:30 ratio resulting in $3\ 850$ non attacks and 37 attacks in the train set and 1650 non attacks and 17 attacks in the test set.
 
 The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promising results.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{final-report/img/friday/friday-rf-normalized.png}
+    \includegraphics[width=0.75\textwidth]{final-report/img/wednesday/confusion-matrix-normalized.png}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
@@ -287,9 +318,36 @@ The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promis
      predicted attack & 3 & 14 \\
      \hline
     \end{tabular}
-    \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 1}
+    \caption{Confusion matrix with absolute values for the experiment 1}
     \label{fig-exp2-transcriptions}
 \end{figure}
+
+
+\vspace{0.5cm}
+\noindent\textbf{Baseline Model}
+
+% \noindent We didn't necessarily train and test our baseline model on exactly the same train and test network flows as we did for the model on top of transcriptions data. Nevertheless, we subsampled from the same sets of network flows which minimizes the impact of not using the same network flows for training and testing the models. The counts for train and test sets are exactly the same as for the first part of this experiment.
+
+% In this case we achieved better results than for the model trained and tested on top of the transcriptions data set. The results are captured in the Figure \ref{fig-exp1-baseline}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{final-report/img/wednesday/wednesday-baseline-normalized.png}
+
+    \centering
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 1649 & 1 \\
+     \hline
+     predicted attack & 2 & 15 \\
+     \hline
+    \end{tabular}
+    \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 1}
+    \label{fig-exp1-baseline}
+\end{figure}
+
 
 
 
