@@ -1,4 +1,4 @@
-anomalyID, srcIP, srcPort, dstIP, dstPort, taxonomy, heuristic, distance, nbDetectors, label
+anomalyID,sourceIPAddress,srcPort,destinationIPAddress,dstPort,taxonomy,heuristic,distance,nbDetectors,label
 0,203.66.170.199,,96.187.45.2,,alphfl,-0.13125,1,suspicious
 1,61.33.10.20,,,23,sntscSYN,-0.305426,1,suspicious
 2,123.114.242.116,,203.66.174.109,80,salphfl,-0.324235,2,suspicious
