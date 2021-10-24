@@ -16,6 +16,7 @@ X_train = df.drop(columns=['flowStartMilliseconds', 'sourceIPAddress', 'destinat
 
 X_train = np.nan_to_num(X_train)
 y_train = np.nan_to_num(y_train)
+
 #%% Reading test data
 df_test = pd.read_csv('model/tabular/Friday_labeled_test.csv')
 y_test = df_test[target].to_numpy()
@@ -30,15 +31,40 @@ dict(zip(unique, counts))
 
 
 #%% Classifier definition
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier, GradientBoostingClassifier, RandomForestClassifier
+from sklearn.linear_model import PassiveAggressiveClassifier, RidgeClassifierCV, SGDClassifier, Perceptron
+from sklearn.naive_bayes import BernoulliNB
+from sklearn.svm import SVC, LinearSVC
+from sklearn.tree import ExtraTreeClassifier, DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegressionCV
+random_seed = 123
 MLA = [
-    # Ensemble Methods
-    GradientBoostingClassifier(),
-    RandomForestClassifier(),
+    #Ensemble Methods
+    AdaBoostClassifier(random_state=random_seed),
+    BaggingClassifier(random_state=random_seed),
+    ExtraTreesClassifier(random_state=random_seed),
+    GradientBoostingClassifier(random_state=random_seed),
+    RandomForestClassifier(random_state=random_seed),
 
     # GLM
-    # LogisticRegressionCV(),
+    LogisticRegressionCV(random_state=random_seed),
+    PassiveAggressiveClassifier(random_state=random_seed),
+    RidgeClassifierCV(),
+    SGDClassifier(random_state=random_seed),
+    Perceptron(random_state=random_seed),
+
+    # Navies Bayes
+    BernoulliNB(),
+
+    # SVM
+    SVC(probability=True, random_state=random_seed),
+    # NuSVC(probability=True, random_state=random_seed),
+    LinearSVC(random_state=random_seed),
+
+    # Trees
+    DecisionTreeClassifier(random_state=random_seed),
+    ExtraTreeClassifier(random_state=random_seed)
+
 ]
 
 #%%
@@ -46,7 +72,7 @@ MLA_columns = ['MLA Name', 'MLA Parameters', 'MLA Test Report', 'MLA Test F1', '
 MLA_compare = pd.DataFrame(columns = MLA_columns)
 
 #%%
-from sklearn.metrics import accuracy_score, classification_report, average_precision_score, f1_score
+from sklearn.metrics import classification_report, average_precision_score, f1_score
 row_index = 0
 for alg in MLA:
     # set name and parameters
@@ -62,6 +88,7 @@ for alg in MLA:
     report = classification_report(y_true=y_test, y_pred=y_pred)
     ap = average_precision_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
+    importance = alg.coef_
 
     MLA_compare.loc[row_index, 'MLA Test Report'] = report
     MLA_compare.loc[row_index, 'MLA Test F1'] = f1
@@ -69,6 +96,6 @@ for alg in MLA:
 
     row_index += 1
 
-print(MLA_compare)
 
+MLA_compare.to_csv("baseline_classifiers.csv")
 
