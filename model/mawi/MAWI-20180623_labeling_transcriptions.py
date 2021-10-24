@@ -31,3 +31,7 @@ filtered_df = appended[appended['transcription'].map(len) > 2]
 
 #%%
 filtered_df.to_csv("./model/mawi/full_dataset.csv")
+
+
+#%%
+transcription_df = pd.read_csv("./model/mawi/full_dataset.csv")[['sourceIPAddress', 'destinationIPAddress', 'transcription', 'label']]
