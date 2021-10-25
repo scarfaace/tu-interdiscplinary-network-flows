@@ -1,5 +1,5 @@
 
-base_file_name="${1:-Friday}"
+base_file_name="${1:-Tuesday}"
 pcap_file_path="../../../../../resources/CIC-IDS-2017/${base_file_name}-WorkingHours.pcap"
 feature_extraction_output_file_path="./${base_file_name}.csv"
 feature_extraction_config_path="./2tuple_bidi.json"

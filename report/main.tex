@@ -32,7 +32,7 @@ pcap2transcription \cite{pcap2transcription} is a preliminary project that tries
 
 
 \section{Methodology}
-\subsection{Data}
+\subsection{Data}\label{sec-data-cic-ids-2017}
 % describe what data set I was working with (CIC2017 IDS dataset (synthetic labeled)
 For the purpose of our experiments we used the synthetic CIC IDS 2017 data set \cite{sharafaldin2018toward}. The data set contains pcap files and labels of the network flows. The labels are binary -- attack and non-attack.
 
@@ -82,7 +82,7 @@ These three are basic features that can be easily extracted from both encrypted 
 
 % The output of our data processing pipeline is a tsv file with four columns -- Source IP, Destination IP, Attack, Transcription. The IP addresses represent the communication endpoints. The Attack attribute contains a binary information whether the network flow is an attack or not. The Transcription attribute contains the transcription itself.
 
-\subsubsection{Transcriptions}
+\subsubsection{Transcriptions}\label{sec-transcriptions}
 
 A transcription is a string of characters describing a network flow. We use 93 characters to for constructing a transcription string. These are printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) where each character represents a captured packet length. Each character represents different packet lengths. Transcription string characters are ordered in the same chronological order as the packet captures.
 
@@ -127,7 +127,7 @@ $$ CCn!D!n $$
 
 \subsection{Output Data Set}\label{sec-output-dataset}
 
-The output data set built from pcap files is a TSV file. Such structured TSV file contains 5 features. These are:
+The output data set containing transcriptions derived from pcap files is a TSV file. The output file contains 5 columns. These are:
 \begin{itemize}
     \item \textit{flowStartMilliseconds} -- flow start in milliseconds,
     \item \textit{flowDurationMilliseconds} - flow duration in milliseconds,
@@ -180,11 +180,48 @@ The final structure of the output TSV file is the following: \textit{srcIP, dstI
 
 \section{Testing}
 
-\noindent\textbf{Transcriptions Data Set}
+\subsection{CIC-IDS2017 Data Set Experiments}
 
-For the testing purposes we always decided to train a Random Forest on top of bag of words for the transcription data sets comparing it to a baseline Random Forest models on top of numeric vectors representing the flows using the same features as those which were used for building transcriptions. The goal was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of the whole test set is meaningless for us as our data set is imbalanced and therefore overall accuracy may distort results.
+The experiments provided in this section were conducted on top of the CIC-IDS2017 data set described in the section \ref{sec-data-cic-ids-2017}. As the whole data set consists of several sub data sets, we conducted experiments on top of almost each one of these sub data sets.
 
-We used a simple bag of words technique to express our transcription strings as numeric vectors. For each entry of the data set (a transcription) we counted number of each word in the transcription. Basically, we transformed our data set of transcriptions to the data set where our dimensions represented the word counts in transcriptions. For better understanding, see an example at figure \ref{fig-bag-of-words-example}.
+As Monday data do not have any malicious traffic, we skipped this one. All the data sets from Tuesday to Friday contain both malicious and non-malicious traffic, so we used these for the purpose of our experiments and conducted an experiment on top of each of them.
+
+From each data set from Thursday to Friday, we derive two different data sets. One for training and evaluating a baseline model. The other one is a data set of transcriptions.
+
+The goal for these experiments was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of whole test sets is meaningless for us as our data sets are imbalanced and therefore overall accuracy may distort results.\\
+
+
+\noindent\textbf{Baseline Model}
+
+For a baseline model we chose to train Random Forest models. We aggregated several network flow features in order to create data sets of numeric vectors. We used the very same network flow features for constructing these numeric vectors of the data sets as the ones that we use for constructing transcriptions. These features are:
+
+\begin{itemize}
+    \item \textit{packet length},
+    \item \textit{flow direction},
+    \item \textit{inter packet time}.
+\end{itemize}
+
+\noindent For each \textit{flow direction} (forward/backward) we used each of these aggregation functions on top of the \textit{packet length} and \textit{inter packet time} features:
+
+\begin{itemize}
+    \item \textit{min},
+    \item \textit{max},
+    \item \textit{median},
+    \item \textit{mean},
+    \item \textit{mode},
+    \item \textit{stdev}.
+\end{itemize}
+
+\vspace{0.5cm}
+
+
+\noindent\textbf{Transcription Data Set}
+
+We always decided to train a Random Forest on top of bag of words for the transcription data sets comparing it to a baseline Random Forest models on top of numeric vectors representing the flows using the same features as those which were used for building transcriptions.
+
+In the experiments we work with the same schema of transcription data sets as described in the section \ref{sec-output-dataset} and the same transcriptions schema as described in the section \ref{sec-transcriptions}.
+
+We used a bag of words technique to express our transcription strings as numeric vectors. For each entry of the data set (a transcription) we counted number of each word in the transcription. Basically, we transformed our data set of transcriptions to the data set where our dimensions represented the word counts in transcriptions. For better understanding, see an example at figure \ref{fig-bag-of-words-example}.
 
 \begin{figure}[h!]
 \centering
@@ -212,30 +249,9 @@ We used a simple bag of words technique to express our transcription strings as 
 \end{figure}
 
 
-\noindent\textbf{Baseline Model}
-
-\noindent For a baseline model we chose to train Random Forest models as well but on top of a different data set. We aggregated several network flow features in order to create a data set of numeric vectors. We used the very same network flow features for constructing these numeric vectors as the ones that we used for constructing the transcriptions. These features are:
-
-\begin{itemize}
-    \item \textit{packet length},
-    \item \textit{flow direction},
-    \item \textit{inter packet time}.
-\end{itemize}
-
-\noindent For each \textit{flow direction} (forward/backward) we used each of these aggregation functions on top of the \textit{packet length} and \textit{inter packet time} features:
-
-\begin{itemize}
-    \item \textit{min},
-    \item \textit{max},
-    \item \textit{median},
-    \item \textit{mean},
-    \item \textit{mode},
-    \item \textit{stdev}.
-\end{itemize}
 
 
-
-\subsection{Experiment 1}
+\subsubsection{Friday}
 
 For this experiment we used the Friday's CIC-IDS 2017 data. We were performing binary classification deciding between attack and non-attack communications. We extracted the network flows from the pcap file using go-flows. This was done using key features \textit{sourceIPAddress} and \textit{destinationIPAddress}. Next, we used \textit{active\textunderscore timeout} as well as \textit{idle\textunderscore timeout} equal to 60. This set up extracted altogether $73\ 726$ flows out of which $192$ are attack flows.
 
@@ -297,7 +313,7 @@ In this case we achieved better results than for the model trained and tested on
 % describe the results that I got (the confusion matrix, accuracy etc). Next describe how I constructed the train and test data set, how many entries the train and test data set contain
 
 
-\subsection{Experiment 2}
+\subsubsection{Wednesday}
 This experiment has completely the same configuration as the experiment 1 with a difference of the used data set. In the experiment 1 we worked with CIC-IDS 2017 Friday data set. Here we are working with CIC-IDS 2017 Wednesday data set.
 
 The data set contains $80\ 716$ entries out of which only 54 are attacks. We sampled $5\ 500$ non attack entries from this file for the sake of our experiment and we kept all 54 attacks. The train to test set was split in 70:30 ratio resulting in $3\ 850$ non attacks and 37 attacks in the train set and 1650 non attacks and 17 attacks in the test set.
@@ -345,9 +361,60 @@ The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promis
      \hline
     \end{tabular}
     \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 1}
-    \label{fig-exp1-baseline}
+    \label{fig-exp2-baseline}
 \end{figure}
 
+
+\subsubsection{Tuesday}
+In this experiment we work with CIC-IDS 2017 Tuesday data set.
+
+The data set contains $80\ 898$ entries out of which only 11 are attacks. We sampled $5\ 500$ non attack entries from this file for the sake of our experiment and we kept all 11 attacks. The train to test set was split in 70:30 ratio resulting in $3\ 850$ non attacks and 37 attacks in the train set and 1650 non attacks and 17 attacks in the test set.
+
+The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promising results.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{final-report/img/tuesday/confusion-matrix-normalized.png}
+
+    \centering
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 1650 & 0 \\
+     \hline
+     predicted attack & 1 & 3 \\
+     \hline
+    \end{tabular}
+    \caption{Confusion matrix with absolute values for the experiment 1}
+    \label{fig-exp3-transcriptions}
+\end{figure}
+
+
+\vspace{0.5cm}
+\noindent\textbf{Baseline Model}
+
+% \noindent We didn't necessarily train and test our baseline model on exactly the same train and test network flows as we did for the model on top of transcriptions data. Nevertheless, we subsampled from the same sets of network flows which minimizes the impact of not using the same network flows for training and testing the models. The counts for train and test sets are exactly the same as for the first part of this experiment.
+
+% In this case we achieved better results than for the model trained and tested on top of the transcriptions data set. The results are captured in the Figure \ref{fig-exp1-baseline}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{final-report/img/tuesday/tuesday-baseline-normalized.png}
+
+    \centering
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 1650 & 0 \\
+     \hline
+     predicted attack & 1 & 3 \\
+     \hline
+    \end{tabular}
+    \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 1}
+    \label{fig-exp3-baseline}
+\end{figure}
 
 
 
