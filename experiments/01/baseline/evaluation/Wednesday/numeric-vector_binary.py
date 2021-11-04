@@ -6,7 +6,8 @@ from pandas import DataFrame
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, plot_confusion_matrix
-from sklearn.model_selection import cross_val_score
+from sklearn.experimental import enable_halving_search_cv
+from sklearn.model_selection import cross_val_score, HalvingGridSearchCV
 from sklearn.model_selection import train_test_split
 
 #%%
@@ -51,13 +52,22 @@ print("TEST:  Samples per class: {}".format(np.bincount(y_test)))
 
 
 #%%
-# model = LogisticRegression()
-sample_weight = np.array([1 if i == 1 else 1 for i in y_train])
-model = RandomForestClassifier(random_state=20)
-model.fit(X_train, y_train, sample_weight=sample_weight)
-print("Train set score: {:.3f}".format(model.score(X_train, y_train)))
-print("Test set score:  {:.3f}".format(model.score(X_test, y_test)))
+# sample_weight = np.array([1 if i == 1 else 1 for i in y_train])
+# model = RandomForestClassifier(random_state=20)
+# model.fit(X_train, y_train, sample_weight=sample_weight)
+# print("Train set score: {:.3f}".format(model.score(X_train, y_train)))
+# print("Test set score:  {:.3f}".format(model.score(X_test, y_test)))
 
+param_grid = {
+    'max_depth': [10, 11, 12, 13, 14, 15],
+    'min_samples_split': [3, 5, 8, 10, 15, 20, 30]
+}
+
+base_estimator = RandomForestClassifier(n_estimators=100, class_weight='balanced_subsample', verbose=0, n_jobs=-1, random_state=20)
+
+grid_search = HalvingGridSearchCV(base_estimator, param_grid, cv=5, factor=2, resource='n_estimators', max_resources=20, random_state=2021, n_jobs=-1, verbose=1)
+grid_search.fit(X_train, y_train)
+model = grid_search.best_estimator_
 
 #%%
 predictions = model.predict(X_test)

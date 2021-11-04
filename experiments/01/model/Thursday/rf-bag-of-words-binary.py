@@ -7,13 +7,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, plot_confusion_matrix
-from sklearn.model_selection import cross_val_score
+from sklearn.experimental import enable_halving_search_cv
+from sklearn.model_selection import cross_val_score, HalvingGridSearchCV
 from sklearn.model_selection import train_test_split
 
 #%%
 # Read data
 mergedAllDf = pd.read_csv("experiments/01/transcription/out/Thursday_transcription_labeled.tsv", sep='\t', quoting=3)
-nonAttacksDf = mergedAllDf[mergedAllDf.Label == 0].sample(n=5500, random_state=123)
+nonAttacksDf = mergedAllDf[mergedAllDf.Label == 0].sample(n=20000, random_state=123)
 attacksDf = mergedAllDf[mergedAllDf.Label == 1]
 
 nonAttacksDf = nonAttacksDf[['Label', 'transcription']]
@@ -67,12 +68,22 @@ X_test_words = vectorizer.transform(X_test.values.astype('U'))
 
 #%%
 # model = LogisticRegression()
-sample_weight = np.array([4 if i == 1 else 1 for i in y_train])
-model = RandomForestClassifier(random_state=20)
-model.fit(X_train_words, y_train, sample_weight=sample_weight)
-print("Train set score: {:.3f}".format(model.score(X_train_words, y_train)))
-print("Test set score:  {:.3f}".format(model.score(X_test_words, y_test)))
+# sample_weight = np.array([13 if i == 1 else 1 for i in y_train])
+# model = RandomForestClassifier(random_state=20, n_jobs=-1)
+# model.fit(X_train_words, y_train, sample_weight=sample_weight)
+# print("Train set score: {:.3f}".format(model.score(X_train_words, y_train)))
+# print("Test set score:  {:.3f}".format(model.score(X_test_words, y_test)))
 
+param_grid = {
+    'max_depth': [10, 11, 12, 13, 14, 15],
+    'min_samples_split': [3, 5, 8, 10, 15, 20, 30]
+}
+
+base_estimator = RandomForestClassifier(n_estimators=100, class_weight='balanced_subsample', verbose=0, n_jobs=-1, random_state=2021)
+
+grid_search = HalvingGridSearchCV(base_estimator, param_grid, cv=5, factor=2, resource='n_estimators', max_resources=20, random_state=2021, n_jobs=-1, verbose=1)
+grid_search.fit(X_train_words, y_train)
+model = grid_search.best_estimator_
 
 #%%
 predictions = model.predict(X_test_words)

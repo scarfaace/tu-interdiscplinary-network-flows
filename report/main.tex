@@ -178,22 +178,26 @@ Transcription maker filters the TCP packets from the input CSV file and subseque
 The final structure of the output TSV file is the following: \textit{srcIP, dstIP, transcription}. If a file with labels assigned to the network flows was specified, the output TSV file additionally contains one more column -- \textit{label}. Label is a binary label indicating whether a flow is attack or not.
 
 
-\section{Testing}
+\section{Evaluation}
 
-\subsection{CIC-IDS2017 Data Set Experiments}
+\subsection{CIC-IDS2017 Data Set Experiments}\label{sec-cic-ids-experiments}
 
 The experiments provided in this section were conducted on top of the CIC-IDS2017 data set described in the section \ref{sec-data-cic-ids-2017}. As the whole data set consists of several sub data sets, we conducted experiments on top of almost each one of these sub data sets.
 
-As Monday data do not have any malicious traffic, we skipped this one. All the data sets from Tuesday to Friday contain both malicious and non-malicious traffic, so we used these for the purpose of our experiments and conducted an experiment on top of each of them.
+As Monday data do not have any malicious traffic, we skipped this one. All the data sets from Tuesday to Friday contain both malicious and non-malicious traffic, therefore we conducted an experiment on top of each of them.
 
-From each data set from Thursday to Friday, we derive two different data sets. One for training and evaluating a baseline model. The other one is a data set of transcriptions.
+From each data set from Tuesday to Friday, we derive two different data sets for training and evaluating two different models. Both of these models are trained for binary classification, meaning deciding between the two classes -- \textit{attack} and \textit{non-attack}.
 
-The goal for these experiments was to achieve the highest possible accuracy for the \textit{attack} class as well as for the \textit{non-attack} class. Achieving overall accuracy on top of whole test sets is meaningless for us as our data sets are imbalanced and therefore overall accuracy may distort results.\\
+For both the baseline and non-baseline models we split both attacks and non-attacks in the 70:30 train set to test set ratio. Then we merge non-attacks with attacks for both train and test data separately in order to create a single train set and a single test set.
+
+We didn't necessarily train and test our baseline models on exactly the same train and test network flows as we did for the models on top of transcriptions data. Nevertheless, we subsampled from the same sets of network flows which minimizes the impact of not using the same network flows for training and testing the models. The counts for train and test sets are exactly the same for both models in each day, i.e. if Thursday's baseline model has a train set consisted of $1\ 500$ non-attacks and $100$ attacks and a test set consisted of $700$ non-attacks and $50$ attacks, then the same counts for train and test sets are applied to the Random Forest on top of bag of words model.
+
+The goal for these experiments was to achieve the highest possible accuracy for both the \textit{attack} class and the \textit{non-attack} class. Achieving overall accuracy on top of whole test sets is meaningless for us as our data sets are imbalanced and therefore overall accuracy may distort results.\\
 
 
 \noindent\textbf{Baseline Model}
 
-For a baseline model we chose to train Random Forest models. We aggregated several network flow features in order to create data sets of numeric vectors. We used the very same network flow features for constructing these numeric vectors of the data sets as the ones that we use for constructing transcriptions. These features are:
+As a baseline model we chose to train Random Forest models. We aggregated several network flow features in order to create data sets of numeric vectors. We used the very same network flow features for constructing these numeric vectors of the data sets as the ones that we use for constructing transcriptions. These features are:
 
 \begin{itemize}
     \item \textit{packet length},
@@ -215,13 +219,13 @@ For a baseline model we chose to train Random Forest models. We aggregated sever
 \vspace{0.5cm}
 
 
-\noindent\textbf{Transcription Data Set}
+\noindent\textbf{Reference Model}
 
-We always decided to train a Random Forest on top of bag of words for the transcription data sets comparing it to a baseline Random Forest models on top of numeric vectors representing the flows using the same features as those which were used for building transcriptions.
+We always decided to train a Random Forest on top of bag of words for the transcription data sets comparing it to baseline Random Forest models on top of numeric vectors representing the flows using the same features as those which were used for building transcriptions.
 
 In the experiments we work with the same schema of transcription data sets as described in the section \ref{sec-output-dataset} and the same transcriptions schema as described in the section \ref{sec-transcriptions}.
 
-We used a bag of words technique to express our transcription strings as numeric vectors. For each entry of the data set (a transcription) we counted number of each word in the transcription. Basically, we transformed our data set of transcriptions to the data set where our dimensions represented the word counts in transcriptions. For better understanding, see an example at figure \ref{fig-bag-of-words-example}.
+We used a bag of words technique to express our transcription strings as numeric vectors. For each entry of the data set (a transcription) we counted number of each word (symbol) in the transcription. Basically, we transformed our data set of transcriptions to the data set where our dimensions represented the word counts in transcriptions. For better understanding, see an example at figure \ref{fig-bag-of-words-example}.
 
 \begin{figure}[h!]
 \centering
@@ -244,56 +248,51 @@ We used a bag of words technique to express our transcription strings as numeric
  2.2.2.2 & 3.3.3.3 & 0 & 1 & 2 & 0 & 1 \\
  \hline
 \end{tabular}
-\caption{Data set of transcriptions (on top) and bag of words data set (bottom)}
+\caption{Data set of transcriptions (top table) and bag of words data set (bottom table)}
 \label{fig-bag-of-words-example}
 \end{figure}
 
 
-
+\clearpage
 
 \subsubsection{Friday}
 
-For this experiment we used the Friday's CIC-IDS 2017 data. We were performing binary classification deciding between attack and non-attack communications. We extracted the network flows from the pcap file using go-flows. This was done using key features \textit{sourceIPAddress} and \textit{destinationIPAddress}. Next, we used \textit{active\textunderscore timeout} as well as \textit{idle\textunderscore timeout} equal to 60. This set up extracted altogether $73\ 726$ flows out of which $192$ are attack flows.
+For this experiment we used the Friday's CIC-IDS 2017 data. The data set contains altogether $73\ 726$ flows out of which $192$ are attack flows.
 
-We sampled $5\ 500$ non-attack and used all attacks from this data set. This makes altogether a data set of $5\ 692$ entries. We split both attacks and non-attacks in the 70:30 ratio of train to test set. Then we merge non-attacks with attacks for both train and test data separately in order to create a single train set and a single test set.
+We sampled $5\ 500$ non-attacks and used all attacks from this data set. This makes altogether a data set of $5\ 692$ entries.
 
-Training a Random Forest model on top of bag of words created from the transcriptions and predicting the test set entries gives us very promising results as we can see at Figure \ref{fig-friday-rf-normalized} and Table \ref{tab-friday-rf-absolute}.
+The predictions of a reference model gives us very promising results as we can see at Figure \ref{fig-exp1-reference-model}.
 
-Even though the class imbalance was huge, we experimented with different sample weights trying to put higher weight on attack entries as there were too few of them present in the data set, but it turned out that the best performing model is the one using the same sample weight for both.
+Even though the class imbalance was huge, we experimented with different sample weights trying to put higher weight on attack entries as there were too few of them present in the data set, but it turned out that the best performing model is the one using the same sample weight for both classes.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{final-report/img/friday/friday-rf-normalized.png}
-    \caption{Confusion matrix with normalized values for the experiment 1}
-    \label{fig-friday-rf-normalized}
-\end{figure}
+    \includegraphics[width=0.7\textwidth]{final-report/img/friday/friday-rf-normalized.png}
 
-\begin{figure}[h!]
-\centering
-\begin{tabular}{ |c|c|c|c|c|c|c| }
- \hline
-  & true non-attack & true attack \\
- \hline
- predicted non-attack & 1635 & 15 \\
- \hline
- predicted attack & 12 & 46 \\
- \hline
-\end{tabular}
-\caption{Confusion matrix with absolute values for the experiment 1}
-\label{tab-friday-rf-absolute}
+    \centering
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 1635 & 15 \\
+     \hline
+     predicted attack & 12 & 46 \\
+     \hline
+    \end{tabular}
+
+    \caption{Confusion matrices with normalized and absolute values of the reference model for the experiment 1}
+    \label{fig-exp1-reference-model}
 \end{figure}
 
 
 \vspace{0.5cm}
 \noindent\textbf{Baseline Model}
 
-\noindent We didn't necessarily train and test our baseline model on exactly the same train and test network flows as we did for the model on top of transcriptions data. Nevertheless, we subsampled from the same sets of network flows which minimizes the impact of not using the same network flows for training and testing the models. The counts for train and test sets are exactly the same as for the first part of this experiment.
-
-In this case we achieved better results than for the model trained and tested on top of the transcriptions data set. The results are captured in the Figure \ref{fig-exp1-baseline}.
+The baseline model achieves better results here than the reference model. The results are captured in the Figure \ref{fig-exp1-baseline}.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{final-report/img/friday/friday-baseline-normalized.png}
+    \includegraphics[width=0.7\textwidth]{final-report/img/friday/friday-baseline-normalized.png}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
@@ -309,14 +308,13 @@ In this case we achieved better results than for the model trained and tested on
     \label{fig-exp1-baseline}
 \end{figure}
 
+\clearpage
 
 % describe the results that I got (the confusion matrix, accuracy etc). Next describe how I constructed the train and test data set, how many entries the train and test data set contain
 
 
 \subsubsection{Wednesday}
-This experiment has completely the same configuration as the experiment 1 with a difference of the used data set. In the experiment 1 we worked with CIC-IDS 2017 Friday data set. Here we are working with CIC-IDS 2017 Wednesday data set.
-
-The data set contains $80\ 716$ entries out of which only 54 are attacks. We sampled $5\ 500$ non attack entries from this file for the sake of our experiment and we kept all 54 attacks. The train to test set was split in 70:30 ratio resulting in $3\ 850$ non attacks and 37 attacks in the train set and 1650 non attacks and 17 attacks in the test set.
+Here we are working with CIC-IDS 2017 Wednesday data set. The data set contains $80\ 716$ entries out of which only 54 are attacks. We sampled $5\ 500$ non-attacks and we kept all 54 attacks. After splitting the data set to train and test sets, we obtained $3\ 850$ non-attacks and 37 attacks in the train set and 1650 non attacks and 17 attacks in the test set.
 
 The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promising results.
 
@@ -342,8 +340,6 @@ The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promis
 \vspace{0.5cm}
 \noindent\textbf{Baseline Model}
 
-% \noindent We didn't necessarily train and test our baseline model on exactly the same train and test network flows as we did for the model on top of transcriptions data. Nevertheless, we subsampled from the same sets of network flows which minimizes the impact of not using the same network flows for training and testing the models. The counts for train and test sets are exactly the same as for the first part of this experiment.
-
 % In this case we achieved better results than for the model trained and tested on top of the transcriptions data set. The results are captured in the Figure \ref{fig-exp1-baseline}.
 
 \begin{figure}[h!]
@@ -365,10 +361,12 @@ The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promis
 \end{figure}
 
 
+\clearpage
+
 \subsubsection{Tuesday}
 In this experiment we work with CIC-IDS 2017 Tuesday data set.
 
-The data set contains $80\ 898$ entries out of which only 11 are attacks. We sampled $5\ 500$ non attack entries from this file for the sake of our experiment and we kept all 11 attacks. The train to test set was split in 70:30 ratio resulting in $3\ 850$ non attacks and 37 attacks in the train set and 1650 non attacks and 17 attacks in the test set.
+The data set contains $80\ 898$ entries out of which only 11 are attacks. We sampled $5\ 500$ and we kept all 11 attacks. Splitting the data set into train and test sets results in $3\ 850$ non-attacks and 37 attacks in the train set and 1650 non attacks and 4 attacks in the test set.
 
 The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promising results.
 
@@ -394,10 +392,6 @@ The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promis
 \vspace{0.5cm}
 \noindent\textbf{Baseline Model}
 
-% \noindent We didn't necessarily train and test our baseline model on exactly the same train and test network flows as we did for the model on top of transcriptions data. Nevertheless, we subsampled from the same sets of network flows which minimizes the impact of not using the same network flows for training and testing the models. The counts for train and test sets are exactly the same as for the first part of this experiment.
-
-% In this case we achieved better results than for the model trained and tested on top of the transcriptions data set. The results are captured in the Figure \ref{fig-exp1-baseline}.
-
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.75\textwidth]{final-report/img/tuesday/tuesday-baseline-normalized.png}
@@ -421,10 +415,13 @@ The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promis
 
 \clearpage
 \section{Conclusions}
-The results that we obtained are not that bad even though there is a huge room for improvement. Basically, we are able to detect around $10\%$ of attacks and at the same time misclassify only a very few non-attacks.
+In all experiments baseline models scored better results than reference models. However, in most cases the baseline models performed just slightly better than the reference models. This means that the very first outcomes in regards to the transcriptions data set, look promising and we can build on top of them in the future.
 
-While building the schema we tried to avoid such network flow features that could not be used at encrypted communication. Basically all the features except of \textit{protocol identifier} are features that we can use while working with encrypted communication. The \textit{protocol identifier} feature can not be obtained in the IPSec encryption protocol. As soon as we find a way how to filter TCP/IP communication from the pcap captures without using the \textit{protocol identifier} feature, our schema can be fully used for classifying encrypted communication.
+One potential reason why our reference models did not succeed in scoring better results than the baseline models is lack of train data. The transformation of transcription data sets into bag of words data set was failing on bigger data sets due to insufficient RAM. This is the reason why we subsampled only certain amount of non-attack samples for each experiment. Using more samples to be transformed into bag of words was crashing our scripts.
 
+Next potential improvement may be choosing a different model instead of Random Forest on top of bag of words and evaluating its results.
+
+Giving more attention to train and test test splits is another kind of improvement. As mentioned in the section \ref{sec-cic-ids-experiments}, the reference and baseline models are not necessarily trained and tested on the same network flows. On such few data points a slight shuffle in train and test data may play a big role in the final results. Therefore conducting an experiment which compares a reference and a baseline model trained on a data set containing plenty non-attack and attack data points may give us another view on performance.
 
 
 \clearpage
