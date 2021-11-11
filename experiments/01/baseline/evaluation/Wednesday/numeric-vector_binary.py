@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from pandas import DataFrame
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix, plot_confusion_matrix
+from sklearn.metrics import confusion_matrix, plot_confusion_matrix, classification_report
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import cross_val_score, HalvingGridSearchCV
 from sklearn.model_selection import train_test_split
@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 # Read data
 mergedAllDf = pd.read_csv("experiments/01/baseline/evaluation/Wednesday/Wednesday_labeled.csv")
 mergedAllDf = pd.DataFrame(mergedAllDf).fillna(0)
-nonAttacksDf = mergedAllDf[mergedAllDf.Label == 0].sample(n=5500, random_state=123)
+nonAttacksDf = mergedAllDf[mergedAllDf.Label == 0].sample(n=5000, random_state=123)
 attacksDf = mergedAllDf[mergedAllDf.Label == 1]
 
 nonAttacksDf = nonAttacksDf.drop(columns=['flowStartMilliseconds', 'flowDurationMilliseconds', 'sourceIPAddress', 'destinationIPAddress', 'Attack'])
@@ -52,27 +52,29 @@ print("TEST:  Samples per class: {}".format(np.bincount(y_test)))
 
 
 #%%
-# sample_weight = np.array([1 if i == 1 else 1 for i in y_train])
-# model = RandomForestClassifier(random_state=20)
-# model.fit(X_train, y_train, sample_weight=sample_weight)
-# print("Train set score: {:.3f}".format(model.score(X_train, y_train)))
-# print("Test set score:  {:.3f}".format(model.score(X_test, y_test)))
+sample_weight = np.array([1 if i == 1 else 1 for i in y_train])
+model = RandomForestClassifier(random_state=20)
+model.fit(X_train, y_train, sample_weight=sample_weight)
+print("Train set score: {:.3f}".format(model.score(X_train, y_train)))
+print("Test set score:  {:.3f}".format(model.score(X_test, y_test)))
 
-param_grid = {
-    'max_depth': [10, 11, 12, 13, 14, 15],
-    'min_samples_split': [3, 5, 8, 10, 15, 20, 30]
-}
-
-base_estimator = RandomForestClassifier(n_estimators=100, class_weight='balanced_subsample', verbose=0, n_jobs=-1, random_state=20)
-
-grid_search = HalvingGridSearchCV(base_estimator, param_grid, cv=5, factor=2, resource='n_estimators', max_resources=20, random_state=2021, n_jobs=-1, verbose=1)
-grid_search.fit(X_train, y_train)
-model = grid_search.best_estimator_
+# param_grid = {
+#     'max_depth': [10, 11, 12, 13, 14, 15],
+#     'min_samples_split': [3, 5, 8, 10, 15, 20, 30]
+# }
+#
+# base_estimator = RandomForestClassifier(n_estimators=100, class_weight='balanced_subsample', verbose=0, n_jobs=-1, random_state=20)
+#
+# grid_search = HalvingGridSearchCV(base_estimator, param_grid, cv=5, factor=2, resource='n_estimators', max_resources=20, random_state=2021, n_jobs=-1, verbose=1)
+# grid_search.fit(X_train, y_train)
+# model = grid_search.best_estimator_
 
 #%%
 predictions = model.predict(X_test)
 confusion_matrix_result = confusion_matrix(y_test, predictions)
-print("Confusion matrix:\n{}".format(confusion_matrix_result))
+
+print(classification_report(y_test, predictions))
+
 
 # predictionsDf: DataFrame = pd.DataFrame({
 #     'transcription': X_test,

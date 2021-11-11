@@ -6,7 +6,7 @@ from pandas import DataFrame
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix, plot_confusion_matrix
+from sklearn.metrics import confusion_matrix, plot_confusion_matrix, classification_report
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import cross_val_score, HalvingGridSearchCV
 from sklearn.model_selection import train_test_split
@@ -92,12 +92,14 @@ predictions = model.predict(X_test_words)
 confusion_matrix_result = confusion_matrix(y_test, predictions)
 print("Confusion matrix:\n{}".format(confusion_matrix_result))
 
-predictionsDf: DataFrame = pd.DataFrame({
-    'transcription': X_test,
-    'Label': y_test,
-    'Label_predicted': predictions
-})
-predictionsDf.to_csv('predictions.csv', index=False, sep="\t", quoting=3)
+print(classification_report(y_test, predictions))
+
+# predictionsDf: DataFrame = pd.DataFrame({
+#     'transcription': X_test,
+#     'Label': y_test,
+#     'Label_predicted': predictions
+# })
+# predictionsDf.to_csv('predictions.csv', index=False, sep="\t", quoting=3)
 
 #%%
 # https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
