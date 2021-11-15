@@ -17,7 +17,7 @@ RANDOM_STRING=`openssl rand -hex 12 | cut -c1-6`
 feature_extraction_output_file_path="out/features_${RANDOM_STRING}.csv"
 out_transcription_file_path="out/transcription_${RANDOM_STRING}.tsv"
 
-feature_extraction_config_path="feature_extraction/2tuple_bidi_100s.json"
+feature_extraction_config_path="feature_extraction/2tuple_bidi.json"
 
 echo "Processing file ${pcap_file_path}"
 

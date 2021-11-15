@@ -24,7 +24,7 @@ base_file_name="${1:-Monday}"
 pcap_file_path="../../../resources/CIC-IDS-2017/${base_file_name}-WorkingHours.pcap"
 feature_extraction_output_file_path="out/${base_file_name}_features.csv"
 out_transcription_file_path="out/${base_file_name}_transcription.tsv"
-feature_extraction_config_path="feature_extraction/2tuple_bidi_100s.json"
+feature_extraction_config_path="feature_extraction/2tuple_bidi.json"
 
 echo "Processing file ${pcap_file_path}"
 
