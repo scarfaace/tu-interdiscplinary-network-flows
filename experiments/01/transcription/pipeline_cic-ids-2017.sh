@@ -10,8 +10,9 @@ help_run () {
   echo -e "\t pipeline_cic-ids-2017.sh Friday"
 }
 
-pcap_file_path="${1}"
-if [ -z "$pcap_file_path" ]; then
+day_name="${1}"
+#day_name="${1:-Thursday}"
+if [ -z "$day_name" ]; then
   help_run
   exit 1;
 fi
@@ -20,10 +21,9 @@ fi
 export PYTHONPATH=`pwd`/src/main/python/
 
 
-base_file_name="${1:-Monday}"
-pcap_file_path="../../../resources/CIC-IDS-2017/${base_file_name}-WorkingHours.pcap"
-feature_extraction_output_file_path="out/${base_file_name}_features.csv"
-out_transcription_file_path="out/${base_file_name}_transcription.tsv"
+pcap_file_path="../../../resources/CIC-IDS-2017/${day_name}-WorkingHours.pcap"
+feature_extraction_output_file_path="out/${day_name}_features.csv"
+out_transcription_file_path="out/${day_name}_transcription.tsv"
 feature_extraction_config_path="feature_extraction/2tuple_bidi.json"
 
 echo "Processing file ${pcap_file_path}"

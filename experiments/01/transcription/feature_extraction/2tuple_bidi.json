@@ -9,7 +9,6 @@
         "flowDurationMilliseconds",
         "sourceIPAddress",
         "destinationIPAddress",
-        "packetTotalCount",
         {"accumulate": ["ipTotalLength"]},
         {"accumulate": ["_interPacketTimeMilliseconds"]},
         {"accumulate": ["flowDirection"]}

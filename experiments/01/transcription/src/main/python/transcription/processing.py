@@ -10,12 +10,11 @@ csv.field_size_limit(sys.maxsize)
 
 class ExtractedFeaturesRow:
     def __init__(self, flowStartMilliseconds, flowDurationMilliseconds, sourceIPAddress, destinationIPAddress,
-                 packetTotalCount, accumulate_ipTotalLength, accumulate_interPacketTimeMilliseconds, accumulate_flowDirection):
+                 accumulate_ipTotalLength, accumulate_interPacketTimeMilliseconds, accumulate_flowDirection):
         self.flowStartMilliseconds = flowStartMilliseconds
         self.flowDurationMilliseconds = flowDurationMilliseconds
         self.sourceIPAddress = sourceIPAddress
         self.destinationIPAddress = destinationIPAddress
-        self.packetTotalCount = packetTotalCount
         self.accumulate_ipTotalLength = accumulate_ipTotalLength
         self.accumulate_interPacketTimeMilliseconds = accumulate_interPacketTimeMilliseconds
         self.accumulate_flowDirection = accumulate_flowDirection
@@ -27,10 +26,9 @@ class ExtractedFeaturesRow:
             flowDurationMilliseconds=float(row[1]),
             sourceIPAddress=row[2],
             destinationIPAddress=row[3],
-            packetTotalCount=row[4],
-            accumulate_ipTotalLength=cls.parse_row_array_integers(row[5]),
-            accumulate_interPacketTimeMilliseconds=cls.parse_row_array_integers(row[6]),
-            accumulate_flowDirection=cls.parse_row_array_booleans(row[7])
+            accumulate_ipTotalLength=cls.parse_row_array_integers(row[4]),
+            accumulate_interPacketTimeMilliseconds=cls.parse_row_array_integers(row[5]),
+            accumulate_flowDirection=cls.parse_row_array_booleans(row[6])
         )
 
     @classmethod
