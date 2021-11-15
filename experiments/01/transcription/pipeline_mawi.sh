@@ -6,7 +6,6 @@ export PYTHONPATH=`pwd`/src/main/python/
 base_file_name="${1:-201806231400}"
 pcap_file_path="../../../resources/MAWI/${base_file_name}.pcap"
 feature_extraction_output_file_path="out/MAWI/${base_file_name}_features.csv"
-#out_transcription_file_path="out/${base_file_name}_transcription.tsv"
 out_transcription_file_path="out/MAWI/${base_file_name}_transcription.tsv"
 feature_extraction_config_path="feature_extraction/2tuple_bidi_100s.json"
 
