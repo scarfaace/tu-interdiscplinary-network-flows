@@ -1,0 +1,13 @@
+{
+  "features": [
+    "ipTotalLength"
+  ],
+  "active_timeout": 60,
+  "idle_timeout": 60,
+  "_per_packet": true,
+  "bidirectional": true,
+  "key_features": [
+    "sourceIPAddress",
+    "destinationIPAddress"
+  ]
+}
