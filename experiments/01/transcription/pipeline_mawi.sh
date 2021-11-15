@@ -3,11 +3,14 @@
 export PYTHONPATH=`pwd`/src/main/python/
 
 
-base_file_name="${1:-Monday}"
-pcap_file_path="../../../resources/CIC-IDS-2017/${base_file_name}-WorkingHours.pcap"
-feature_extraction_output_file_path="out/${base_file_name}_features.csv"
-out_transcription_file_path="out/${base_file_name}_transcription.tsv"
+base_file_name="${1:-201806231400}"
+pcap_file_path="../../../resources/MAWI/${base_file_name}.pcap"
+feature_extraction_output_file_path="out/MAWI/${base_file_name}_features.csv"
+#out_transcription_file_path="out/${base_file_name}_transcription.tsv"
+out_transcription_file_path="out/MAWI/${base_file_name}_transcription.tsv"
 feature_extraction_config_path="feature_extraction/2tuple_bidi_100s.json"
+
+mkdir -p "out/MAWI"
 
 echo "Processing file ${pcap_file_path}"
 
@@ -18,10 +21,9 @@ echo "Feature extraction finished"
 echo
 
 
-# 2. Extracting flows as conversation transcriptions
+# 2. Transforming network flows into sentence-like transcriptions
 echo "Transforming network flows into sentence-like transcriptions"
 echo `date`
-#python3 src/main/python/transcription/main.py --filename "$feature_extraction_output_file_path" --labels-filename ../../../resources/CIC-IDS-2017/labels_CAIA_17.csv > "$out_transcription_file_path"
 python3 src/main/python/transcription/main.py --filename "$feature_extraction_output_file_path" > "$out_transcription_file_path"
 echo "Finished creating sentence-like transcriptions of network flows."
 echo `date`
