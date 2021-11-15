@@ -1,3 +1,20 @@
+#!/bin/bash
+
+help_run () {
+  echo "Usage: pipeline_cic-ids-2017.sh day"
+  echo "Examples:"
+  echo -e "\t pipeline_cic-ids-2017.sh Monday"
+  echo -e "\t pipeline_cic-ids-2017.sh Tuesday"
+  echo -e "\t pipeline_cic-ids-2017.sh Wednesday"
+  echo -e "\t pipeline_cic-ids-2017.sh Thursday"
+  echo -e "\t pipeline_cic-ids-2017.sh Friday"
+}
+
+pcap_file_path="${1}"
+if [ -z "$pcap_file_path" ]; then
+  help_run
+  exit 1;
+fi
 
 # Add source roots to PYTHONPATH
 export PYTHONPATH=`pwd`/src/main/python/

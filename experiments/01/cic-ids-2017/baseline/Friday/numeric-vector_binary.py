@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 
 #%%
 # Read data
-mergedAllDf = pd.read_csv("experiments/01/baseline/evaluation/Tuesday/Tuesday_labeled.csv")
+mergedAllDf = pd.read_csv("experiments/01/baseline/Friday/Friday_labeled.csv")
 mergedAllDf = pd.DataFrame(mergedAllDf).fillna(0)
 nonAttacksDf = mergedAllDf[mergedAllDf.Label == 0].sample(n=5500, random_state=123)
 attacksDf = mergedAllDf[mergedAllDf.Label == 1]
@@ -69,7 +69,6 @@ base_estimator = RandomForestClassifier(n_estimators=100, class_weight='balanced
 grid_search = HalvingGridSearchCV(base_estimator, param_grid, cv=5, factor=2, resource='n_estimators', max_resources=20, random_state=2021, n_jobs=-1, verbose=1)
 grid_search.fit(X_train, y_train)
 model = grid_search.best_estimator_
-
 
 #%%
 predictions = model.predict(X_test)
