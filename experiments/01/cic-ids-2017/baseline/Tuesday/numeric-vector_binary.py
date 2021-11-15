@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 
 #%%
 # Read data
-mergedAllDf = pd.read_csv("experiments/01/baseline/Tuesday/Tuesday_labeled.csv")
+mergedAllDf = pd.read_csv("experiments/01/cic-ids-2017baseline/Tuesday/Tuesday_labeled.csv")
 mergedAllDf = pd.DataFrame(mergedAllDf).fillna(0)
 nonAttacksDf = mergedAllDf[mergedAllDf.Label == 0].sample(n=5500, random_state=123)
 attacksDf = mergedAllDf[mergedAllDf.Label == 1]
