@@ -3,20 +3,20 @@ This file guides you how to run experiments for the baseline models for each of 
 
 ### Tuesday
 ```shell
-python3 baseline_binary.py --dataset-path datasets/file.csv --non-attacks-subsample-size 5500 --HalvingGridSearchCV
+python3 baseline_binary.py --dataset-path data/Tuesday_labeled.csv --non-attacks-subsample-size 5500 --HalvingGridSearchCV
 ```
 
 ### Wednesday
 ```shell
-python3 baseline_binary.py --dataset-path datasets/file.csv --non-attacks-subsample-size 5000
+python3 baseline_binary.py --dataset-path data/Wednesday_labeled.csv --non-attacks-subsample-size 5000
 ```
 
 ### Thursday
 ```shell
-python3 baseline_binary.py --dataset-path datasets/file.csv --non-attacks-subsample-size 20000 --HalvingGridSearchCV
+python3 baseline_binary.py --dataset-path data/Thursday_labeled.csv --non-attacks-subsample-size 20000 --HalvingGridSearchCV
 ```
 
 ### Friday
 ```shell
-python3 baseline_binary.py --dataset-path datasets/file.csv --non-attacks-subsample-size 5500 --HalvingGridSearchCV
+python3 baseline_binary.py --dataset-path data/Friday_labeled.csv --non-attacks-subsample-size 5500 --HalvingGridSearchCV
 ```
