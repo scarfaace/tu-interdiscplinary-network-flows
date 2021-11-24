@@ -2,9 +2,10 @@ from argparse import ArgumentParser
 
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 from pandas import DataFrame
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import confusion_matrix, classification_report, plot_confusion_matrix
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import HalvingGridSearchCV
 from sklearn.model_selection import train_test_split
@@ -46,8 +47,8 @@ def create_train_test_split(attacksDf: DataFrame, nonAttacksDf: DataFrame):
 def fit_model(X_train, y_train, is_halving_grid_search_cv: bool):
     if is_halving_grid_search_cv:
         param_grid = {
-            'max_depth': [None, 10, 11, 12, 13, 14, 15],
-            'min_samples_split': [None, 3, 5, 8, 10, 15, 20, 30]
+            'max_depth': [10, 11, 12, 13, 14, 15],
+            'min_samples_split': [3, 5, 8, 10, 15, 20, 30]
         }
 
         base_estimator = RandomForestClassifier(n_estimators=100, class_weight='balanced_subsample', verbose=0, n_jobs=-1, random_state=2021)
@@ -67,10 +68,7 @@ def fit_model(X_train, y_train, is_halving_grid_search_cv: bool):
 
 def predict(model, X_test, y_test):
     predictions = model.predict(X_test)
-    confusion_matrix_result = confusion_matrix(y_test, predictions)
-    print("Confusion matrix:\n{}".format(confusion_matrix_result))
-
-    print(classification_report(y_test, predictions))
+    return predictions
 
     # predictionsDf: DataFrame = pd.DataFrame({
     #     'transcription': X_test,
@@ -79,27 +77,33 @@ def predict(model, X_test, y_test):
     # })
     # predictionsDf.to_csv('predictions.csv', index=False)
 
-#%%
-# # https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
-# titles_options = [("Confusion matrix, without normalization", None, '.0f'),
-#                   ("Normalized confusion matrix", 'true', '.3f')]
-# for title, normalize, values_format in titles_options:
-#     disp = plot_confusion_matrix(model, X_test, y_test,
-#                                  cmap=plt.cm.Blues,
-#                                  normalize=normalize,
-#                                  values_format=values_format)
-#     disp.ax_.set_title(title)
-#
-#     print(title)
-#     print(disp.confusion_matrix)
-#     plt.show()
+
+def print_prediction_results(model, predictions, X_test, y_test):
+    confusion_matrix_result = confusion_matrix(y_test, predictions)
+    print("Confusion matrix:\n{}".format(confusion_matrix_result))
+
+    print(classification_report(y_test, predictions))
+
+    # https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+    titles_options = [("Confusion matrix, without normalization", None, '.0f'),
+                      ("Normalized confusion matrix", 'true', '.3f')]
+    for title, normalize, values_format in titles_options:
+        disp = plot_confusion_matrix(model, X_test, y_test,
+                                     cmap=plt.cm.Blues,
+                                     normalize=normalize,
+                                     values_format=values_format)
+        disp.ax_.set_title(title)
+
+        print(title)
+        print(disp.confusion_matrix)
+        # plt.show()
 
 
 def main():
     parser = ArgumentParser(description="")
     parser.add_argument("--dataset-path", type=str, required=True, help="Path to the dataset CSV file.")
     parser.add_argument("--non-attacks-subsample-size", type=int, required=False, help="Size of the non-attacks subsample.", default=5000)
-    parser.add_argument("--HalvingGridSearchCV", type=bool, required=False, help="Path to the dataset CSV file.", default=True)
+    parser.add_argument("--HalvingGridSearchCV", help="Path to the dataset CSV file.", default=False, type=lambda x: (str(x).lower() == 'true'))
     arguments = parser.parse_args()
 
     dataset_path = arguments.dataset_path
@@ -110,6 +114,8 @@ def main():
     X_train, y_train, X_test, y_test = create_train_test_split(attacksDf, nonAttacksDf)
 
     model = fit_model(X_train, y_train, is_halving_grid_search_cv)
-    predict(model, X_test, y_test)
+    predictions = predict(model, X_test, y_test)
+
+    print_prediction_results(model, predictions, X_test, y_test)
 
 main()
