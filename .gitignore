@@ -1,4 +1,5 @@
 .idea/
+venv
 **/__pycache__/
 **/.pytest_cache
 /model/data/old_v1/transcription_Tuesday.csv
