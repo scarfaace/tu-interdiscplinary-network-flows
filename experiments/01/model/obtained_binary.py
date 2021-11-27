@@ -92,9 +92,7 @@ def predict(model, X_test):
 
 
 def print_prediction_results(model, predictions, X_test, y_test):
-    confusion_matrix_result = confusion_matrix(y_test, predictions)
-    print("Confusion matrix:\n{}".format(confusion_matrix_result))
-
+    print("Classification report:")
     print(classification_report(y_test, predictions))
 
     # https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
@@ -114,7 +112,7 @@ def print_prediction_results(model, predictions, X_test, y_test):
 
 def main():
     parser = ArgumentParser(description="")
-    parser.add_argument("--dataset-path", type=str, required=True, help="Path to the dataset CSV file.")
+    parser.add_argument("--dataset-path", type=str, required=True, help="Path to the dataset TSV file.")
     parser.add_argument("--non-attacks-subsample-size", type=int, required=False, help="Size of the non-attacks subsample.", default=5000)
     parser.add_argument("--HalvingGridSearchCV", help="Flag indicating whether halving grid search should be used", default=False, type=lambda x: (str(x).lower() == 'true'))
     arguments = parser.parse_args()
@@ -134,4 +132,3 @@ def main():
     print("Estimator parameters:", model.get_params())
 
 main()
-

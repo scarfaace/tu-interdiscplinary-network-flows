@@ -10,6 +10,19 @@ from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import HalvingGridSearchCV
 from sklearn.model_selection import train_test_split
 
+columns_to_select = ["apply(min(ipTotalLength),forward)", "apply(max(ipTotalLength),forward)",
+                     "apply(median(ipTotalLength),forward)", "apply(mean(ipTotalLength),forward)",
+                     "apply(mode(ipTotalLength),forward)", "apply(stdev(ipTotalLength),forward)",
+                     "apply(min(_interPacketTimeSeconds),forward)", "apply(max(_interPacketTimeSeconds),forward)",
+                     "apply(median(_interPacketTimeSeconds),forward)", "apply(mean(_interPacketTimeSeconds),forward)",
+                     "apply(stdev(_interPacketTimeSeconds),forward)", "apply(min(ipTotalLength),backward)",
+                     "apply(max(ipTotalLength),backward)", "apply(median(ipTotalLength),backward)",
+                     "apply(mean(ipTotalLength),backward)", "apply(mode(ipTotalLength),backward)",
+                     "apply(stdev(ipTotalLength),backward)", "apply(min(_interPacketTimeSeconds),backward)",
+                     "apply(max(_interPacketTimeSeconds),backward)", "apply(median(_interPacketTimeSeconds),backward)",
+                     "apply(mean(_interPacketTimeSeconds),backward)","apply(stdev(_interPacketTimeSeconds),backward)",
+                     'min(_interPacketTimeSeconds)', 'max(_interPacketTimeSeconds)',
+                     'median(_interPacketTimeSeconds)', 'mean(_interPacketTimeSeconds)', 'stdev(_interPacketTimeSeconds)', 'Label']
 
 def read_data(dataset_filepath: str, nonAttacks_subsample_size: int):
     mergedAllDf = pd.read_csv(dataset_filepath)
@@ -18,8 +31,8 @@ def read_data(dataset_filepath: str, nonAttacks_subsample_size: int):
     nonAttacksDf = mergedAllDf[mergedAllDf.Label == 0].sample(n=nonAttacks_subsample_size, random_state=123)
     attacksDf = mergedAllDf[mergedAllDf.Label == 1]
 
-    nonAttacksDf = nonAttacksDf.drop(columns=['flowStartMilliseconds', 'flowDurationMilliseconds', 'sourceIPAddress', 'destinationIPAddress', 'Attack'])
-    attacksDf = attacksDf.drop(columns=['flowStartMilliseconds', 'flowDurationMilliseconds', 'sourceIPAddress', 'destinationIPAddress', 'Attack'])
+    nonAttacksDf = nonAttacksDf[columns_to_select]
+    attacksDf = attacksDf[columns_to_select]
 
     commonDf = pd.concat([nonAttacksDf, attacksDf])
     print("Samples per class: {}".format(np.bincount(commonDf['Label'])))
@@ -78,9 +91,7 @@ def predict(model, X_test, y_test):
 
 
 def print_prediction_results(model, predictions, X_test, y_test):
-    confusion_matrix_result = confusion_matrix(y_test, predictions)
-    print("Confusion matrix:\n{}".format(confusion_matrix_result))
-
+    print("Classification report:")
     print(classification_report(y_test, predictions))
 
     # https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
@@ -116,6 +127,6 @@ def main():
     predictions = predict(model, X_test, y_test)
 
     print_prediction_results(model, predictions, X_test, y_test)
-    print("Estimator parameters:", model.estimator_params)
+    print("Estimator parameters:", model.get_params())
 
 main()

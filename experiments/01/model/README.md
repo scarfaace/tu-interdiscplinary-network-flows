@@ -53,7 +53,7 @@ python3 baseline_binary.py --dataset-path cic-ids-2017/baseline/data/Friday_labe
 ### MAWI
 #### 23rd June 2018, 14:00
 ```shell
-python3 baseline_binary.py --dataset-path cic-ids-2017/baseline/data/mawi_labeled_sampled_transcription.tsv --non-attacks-subsample-size 50000
+python3 baseline_binary.py --dataset-path mawi/baseline/data/baseline_features_labeled.csv --non-attacks-subsample-size 50000 --HalvingGridSearchCV true
 ```
 
 
@@ -104,5 +104,5 @@ python3 obtained_binary.py --dataset-path data/Friday_transcription_labeled.tsv 
 ### MAWI
 #### 23rd June 2018, 14:00
 ```shell
-python3 obtained_binary.py --dataset-path mawi/obtained/data/mawi_labeled_sampled_transcription.tsv --non-attacks-subsample-size 50000
+python3 obtained_binary.py --dataset-path mawi/obtained/data/mawi_labeled_sampled_transcription.tsv --non-attacks-subsample-size 50000 --HalvingGridSearchCV true
 ```

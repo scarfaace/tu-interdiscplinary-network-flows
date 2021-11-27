@@ -38,7 +38,6 @@ echo
 # 2. Extracting flows as conversation transcriptions
 echo "Transforming network flows into sentence-like transcriptions"
 echo `date`
-#python3 src/main/python/transcription/main.py --filename "$feature_extraction_output_file_path" --labels-filename ../../../resources/CIC-IDS-2017/labels_CAIA_17.csv > "$out_transcription_file_path"
 python3 src/main/python/transcription/main.py --filename "$feature_extraction_output_file_path" > "$out_transcription_file_path"
 echo "Finished creating sentence-like transcriptions of network flows."
 echo `date`
