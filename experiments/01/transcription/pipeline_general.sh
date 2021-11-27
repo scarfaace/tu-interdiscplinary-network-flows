@@ -1,7 +1,7 @@
 #!/bin/bash
 
 help_run () {
-  echo "Usage: pipeline-general.sh pcap_file_path"
+  echo "Usage: pipeline-general.sh PCAP_FILE_PATH"
 }
 
 pcap_file_path="${1}"

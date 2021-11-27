@@ -27,6 +27,8 @@ python3 baseline_binary.py --dataset-path datasets/file2.csv --non-attacks-subsa
 ## Experiments
 This file guides you how to run experiments for the baseline models for each of the CIC-IDS 2017 days.
 
+### CIC-IDS 2017 dataset
+
 #### Tuesday
 ```shell
 python3 baseline_binary.py --dataset-path cic-ids-2017/baseline/data/Tuesday_labeled.csv --non-attacks-subsample-size 5500 --HalvingGridSearchCV true
@@ -45,6 +47,13 @@ python3 baseline_binary.py --dataset-path cic-ids-2017/baseline/data/Thursday_la
 #### Friday
 ```shell
 python3 baseline_binary.py --dataset-path cic-ids-2017/baseline/data/Friday_labeled.csv --non-attacks-subsample-size 5500 --HalvingGridSearchCV true
+```
+
+
+### MAWI
+#### 23rd June 2018, 14:00
+```shell
+python3 baseline_binary.py --dataset-path cic-ids-2017/baseline/data/mawi_labeled_sampled_transcription.tsv --non-attacks-subsample-size 50000
 ```
 
 
@@ -69,9 +78,11 @@ python3 obtained_binary.py --dataset-path datasets/file2.tsv --non-attacks-subsa
 ## Experiments
 This file guides you how to run experiments for the baseline models for each of the CIC-IDS 2017 days.
 
+### CIC-IDS 2017 dataset
+
 #### Tuesday
 ```shell
-python3 obtained_binary.py --dataset-path data/Tuesday_transcription_labeled.tsv --non-attacks-subsample-size 5500 --HalvingGridSearchCV
+python3 obtained_binary.py --dataset-path data/Tuesday_transcription_labeled.tsv --non-attacks-subsample-size 5500 --HalvingGridSearchCV true
 ```
 
 #### Wednesday
@@ -81,11 +92,17 @@ python3 obtained_binary.py --dataset-path data/Wednesday_transcription_labeled.t
 
 #### Thursday
 ```shell
-python3 obtained_binary.py --dataset-path data/Thursday_transcription_labeled.tsv --non-attacks-subsample-size 20000 --HalvingGridSearchCV
+python3 obtained_binary.py --dataset-path data/Thursday_transcription_labeled.tsv --non-attacks-subsample-size 20000 --HalvingGridSearchCV true
 ```
 
 #### Friday
 ```shell
-python3 obtained_binary.py --dataset-path data/Friday_transcription_labeled.tsv --non-attacks-subsample-size 5500 --HalvingGridSearchCV
+python3 obtained_binary.py --dataset-path data/Friday_transcription_labeled.tsv --non-attacks-subsample-size 5500 --HalvingGridSearchCV true
 ```
 
+
+### MAWI
+#### 23rd June 2018, 14:00
+```shell
+python3 obtained_binary.py --dataset-path mawi/obtained/data/mawi_labeled_sampled_transcription.tsv --non-attacks-subsample-size 50000
+```

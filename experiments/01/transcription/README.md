@@ -16,41 +16,42 @@ Flow extractor: https://github.com/CN-TU/go-flows
 
 --------------------------
 
-## Available Scripts
+## Scripts
 
-### pipeline.sh
-- the script `pipeline.sh` creates NTFT out of the specified pcap file
-- mind that right now the `pipeline.sh` script is tailored for processing CIC IDS 2017 data as well as
-  labeling them (attacks/non-attack)
-- how to run:
-  - extract CIC IDS 2017 dataset labels `/transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv.gz` into `transcription/resources/CIC-IDS-2017/labels_CAIA_17.csv`
-  - download any pcap day data from http://205.174.165.80/CICDataset/CIC-IDS-2017/Dataset/PCAPs/ and save it into 
-    the folder `/transcription/resources/CIC-IDS-2017` with its original name (e.g. `Monday-WorkingHours.pcap`)
-  - navigate to the `transcription` folder in the root directory 
-  - run `pipeline.sh` with the 1st parameter as the name of the day that you downloaded and the script will fill in everything else
-  - examples: 
-    - `./pipeline.sh Monday`
-    - `./pipeline.sh Tuesday`
-  - after the run is finished, you can find your final output NTFT files in `/transcription/out/`
+### pipeline_cic-ids-2017.sh
+- This script creates sentence-like transcriptions out of the specified CIC-IDS-2017 pcap file.
+- Before running the script, you have to download the CIC-IDS-2017 pcap files 
+\[https://www.unb.ca/cic/datasets/ids-2017.html].
+  - Save these files into `resources/CIC-IDS-2017` folder located in the project root 
+    and keep its original names.
+- The final output transcription file will be stored in the `out/` folder.
 
 
-### pipeline-general.sh
-
-- `pipeline-general.sh` allows you to run the whole pcap to NTFT pipeline with your defined input pcap file
-- just run pipeline-general.sh script with the 1st argument specifying the path to your pcap file
-- example: `./pipeline.sh /home/myuser/test.pcap`
-- the final output NTFT file will be stored in `/transcription/out/` folder
-
----
-
-## Examples
-
-While located in `/transcription` directory, run
-
+#### Run
 ```shell
-./pipeline-general.sh ./in/test.pcap
+./pipeline_cic-ids-2017.sh DAY
+```
+`DAY` - the data day which you want to process, one of the following values:
+`Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`
+
+##### Examples
+```shell
+./pipeline_cic-ids-2017.sh Wednesday
+./pipeline_cic-ids-2017.sh Friday
 ```
 
-in order to convert a test pcap file `/transcription/in/test.pcap` into NTFT.
-You will find the output TSV file in `/transcription/out/` as described in the section
-about [pipeline-general.sh](#pipeline-generalsh)
+
+### pipeline_general.sh
+- This script creates sentence-like transcriptions out of the specified pcap file.
+- The final output transcription file will be stored in the `out/` folder.
+
+#### Run
+```shell
+./pipeline_general.sh PCAP_FILE_PATH
+```
+`PCAP_FILE_PATH` - the pcap data file to be processed
+
+#### Examples
+```shell
+./pipeline_general.sh ~/data/my-file.pcap
+```
