@@ -1,15 +1,30 @@
+#!/bin/bash
+
+help_run () {
+  echo "Usage: pipeline_cic-ids-2017.sh day"
+  echo "Examples:"
+  echo -e "\t pipeline_cic-ids-2017.sh Monday"
+  echo -e "\t pipeline_cic-ids-2017.sh Tuesday"
+  echo -e "\t pipeline_cic-ids-2017.sh Wednesday"
+  echo -e "\t pipeline_cic-ids-2017.sh Thursday"
+  echo -e "\t pipeline_cic-ids-2017.sh Friday"
+}
+
+day_name="${1}"
+#day_name="${1:-Thursday}"
+if [ -z "$day_name" ]; then
+  help_run
+  exit 1;
+fi
 
 # Add source roots to PYTHONPATH
 export PYTHONPATH=`pwd`/src/main/python/
 
 
-base_file_name="${1:-Thursday}"
-pcap_file_path="../../../resources/CIC-IDS-2017/${base_file_name}-WorkingHours.pcap"
-feature_extraction_output_file_path="out/${base_file_name}_features.csv"
-#out_transcription_file_path="out/${base_file_name}_transcription.tsv"
-out_transcription_file_path="out/${base_file_name}_transcription.tsv"
-#feature_extraction_config_path="feature_extraction/pcap2pkts.json"
-feature_extraction_config_path="feature_extraction/2tuple_bidi_100s.json"
+pcap_file_path="../../../resources/CIC-IDS-2017/${day_name}-WorkingHours.pcap"
+feature_extraction_output_file_path="out/${day_name}_features.csv"
+out_transcription_file_path="out/${day_name}_transcription.tsv"
+feature_extraction_config_path="feature_extraction/2tuple_bidi.json"
 
 echo "Processing file ${pcap_file_path}"
 
@@ -21,7 +36,7 @@ echo
 
 
 # 2. Extracting flows as conversation transcriptions
-echo "Extracting flows as conversation transcriptions"
+echo "Transforming network flows into sentence-like transcriptions"
 echo `date`
 #python3 src/main/python/transcription/main.py --filename "$feature_extraction_output_file_path" --labels-filename ../../../resources/CIC-IDS-2017/labels_CAIA_17.csv > "$out_transcription_file_path"
 python3 src/main/python/transcription/main.py --filename "$feature_extraction_output_file_path" > "$out_transcription_file_path"
