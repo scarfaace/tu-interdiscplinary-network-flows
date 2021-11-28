@@ -220,11 +220,11 @@ $$ CCn!D!n $$
 % describe the software itself, the scripts for data processing, what language I used
 
 \subsubsection{Data Processing Pipeline}
-The software for processing the \textit{pcap} files and converting network flows into sentence-like transcriptions is a data processing pipeline consisted of two steps. The two-step process consists of extracting the necessary features from a \textit{pcap} file with \textit{go-flows} software \cite{goflows-reference} and the 2nd step is the transcriptions building process itself based on the output from the 1st step. The data processing pipeline itself is a shell script that orchestrates the steps to be done in order to achieve the final output. The path to the script is \verb|experiments/01/transcription/pipeline-general.sh|
+The software for processing the \textit{pcap} files and converting network flows into sentence-like transcriptions is a data processing pipeline consisted of two steps. The two-step process consists of extracting the necessary features from a \textit{pcap} file with \textit{go-flows} software \cite{goflows-reference} and the 2nd step is the transcriptions building process itself based on the output from the 1st step. The data processing pipeline itself is a shell script that orchestrates the steps to be done in order to achieve the final output. The path to the script is \verb|experiments/01/transcription/pipeline_general.sh|
 
 
 \subsubsection{go-flows Features Extraction}\label{sec:go-flows-feature-extraction}
-First step of data processing pipeline is extracting features from a pcap file using go-flows. go-flows uses a configuration file which describes what features we want to extract from a pcap. The configuration file for go-flows used in our data processing pipeline is located in \verb|/transcription/feature_extraction/2tuple_bidi.json|. This configuration file makes go-flows produce a CSV file containing network flows with following features:
+First step of data processing pipeline is extracting features from a pcap file using go-flows. go-flows uses a configuration file which describes what features we want to extract from a pcap. The configuration file for go-flows used in our data processing pipeline is located in \verb|experiments/01/transcription/feature_extraction/2tuple_bidi.json|. This configuration file makes go-flows produce a CSV file containing network flows with following features:
 
 \begin{itemize}
     \item \textit{flowStartMilliseconds} -- beginning of a flow timestamp in ms,
@@ -247,7 +247,7 @@ Transcription maker read the input CSV file line by line (a.k.a. flow by flow) a
 
 The final structure of the output TSV file produced by the transcription maker software is described in the section \ref{sec-output-dataset}.
 
-The source code of the transcriptions maker software is located in the project's repository in the path \verb|/experiments/01/transcription/src/main/python/transcription|.
+The source code of the transcriptions maker software is located in the project's root in the folder \verb|experiments/01/transcription/src/main/python/transcription|.
 
 %---------------------------------------------------------------------
 
@@ -359,9 +359,9 @@ The baseline model achieves better results here in regards to predicting non-att
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 92.4\% & 7.6\% \\
+     predicted non-attack & 92.36\% & 7.64\% \\
      \hline
-     predicted attack & 8.6\% & 91.4\% \\
+     predicted attack & 8.62\% & 91.38\% \\
      \hline
     \end{tabular}
 
@@ -391,9 +391,9 @@ The baseline model achieves better results here in regards to predicting non-att
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 99.2\% & 0.8\% \\
+     predicted non-attack & 99.15\% & 0.85\% \\
      \hline
-     predicted attack & 6.9\% & 93.1\% \\
+     predicted attack & 6.90\% & 93.10\% \\
      \hline
     \end{tabular}
 
@@ -449,9 +449,7 @@ The baseline model achieves better results here in regards to predicting non-att
 \subsubsection{Wednesday}
 Here we are working with CIC-IDS 2017 Wednesday data set. We sampled $5\ 000$ non-attacks and we kept all 54 attacks. After splitting the data set to train and test sets, we obtained $3\ 500$ non-attacks and 37 attacks in the train set and 1500 non attacks and 17 attacks in the test set.
 
-The confusion matrices in Figure \ref{fig-exp2-transcriptions} again show promising results with non-attacks predicting precision almost $100\%$ and attacks predicting precision $82.4\%$.
-
-In this experiment, the baseline model scored was able to score slightly better results than the obtained model. Concretely, classifying one more attack correctly and one more non-attack correctly than the obtained model. See the Figure \ref{fig-exp2-baseline}.
+The baseline model was able to score slightly better results here than the obtained model. Concretely, classifying two more attack correctly.
 
 \begin{figure}[h!]
     \centering
@@ -460,9 +458,9 @@ In this experiment, the baseline model scored was able to score slightly better 
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 99.9\% & 0.1\% \\
+     predicted non-attack & 100.0\% & 0.0\% \\
      \hline
-     predicted attack & 17.6\% & 82.4\% \\
+     predicted attack & 23.53\% & 76.47\% \\
      \hline
     \end{tabular}
 
@@ -473,14 +471,23 @@ In this experiment, the baseline model scored was able to score slightly better 
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 1498 & 2 \\
+     predicted non-attack & 1500 & 0 \\
      \hline
-     predicted attack & 3 & 14 \\
+     predicted attack & 4 & 13 \\
      \hline
     \end{tabular}
     \caption{Confusion matrices with normalized and absolute values of the obtained model for the experiment 2}
     \label{fig-exp2-transcriptions}
 \end{figure}
+% [[1500    0]
+%  [   4   13]]
+% /home/allan/Documents/tu/exercises/interdisciplinary-project/tu-interdiscplinary-network-flows/venv/lib/python3.8/site-packages/sklearn/utils/deprecation.py:87: FutureWarning: Function plot_confusion_matrix is deprecated; Function `plot_confusion_matrix` is deprecated in 1.0 and will be removed in 1.2. Use one of the class methods: ConfusionMatrixDisplay.from_predictions or ConfusionMatrixDisplay.from_estimator.
+%   warnings.warn(msg, category=FutureWarning)
+% Normalized confusion matrix
+% [[1.         0.        ]
+%  [0.23529412 0.76470588]]
+
+
 
 
 % In this case we achieved better results than for the model trained and tested on top of the transcriptions data set. The results are captured in the Figure \ref{fig-exp1-baseline}.
@@ -493,9 +500,9 @@ In this experiment, the baseline model scored was able to score slightly better 
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 99.9\% & 0.1\% \\
+     predicted non-attack & 99.93\% & 0.07\% \\
      \hline
-     predicted attack & 11.8\% & 88.2\% \\
+     predicted attack & 11.76\% & 88.24\% \\
      \hline
     \end{tabular}
 
@@ -621,9 +628,9 @@ In this experiment we work with CIC-IDS 2017 Thursday data set.
 
 The data set contains $77\ 069$ entries out of which only $1\ 121$ are attacks. We sampled $20\ 000$ non-attacks and we kept all $1\ 121$ attacks. Splitting the data set into train and test sets results in $14\ 000$ non-attacks and 784 attacks in the train set and $6\ 000$ non attacks and 337 attacks in the test set.
 
-The confusion matrices in Figure \ref{fig-exp4-transcriptions} show worse results than in the previous experiments with attacks classification precision nearly $40\%$ and non-attacks classification precision $77.6\%$.
+The confusion matrices in Figure \ref{fig-exp4-transcriptions} show worse results than in the previous experiments with attacks classification precision nearly $50\%$ and non-attacks classification precision slightly above $75\%$.
 
-The baseline model scores better results than the obtained model here. We can observe its results in the Figure \ref{fig-exp4-baseline}. The precision of non-attacks classification is about $10\%$ higher than in the obtained model and the precision of attacks classification is about $16\%$ higher than in the obtained model.
+The baseline model scores better results than the obtained model here. We can observe its results in the Figure \ref{fig-exp4-baseline}. The precision of non-attacks classification is about $9\%$ higher than in the obtained model and the precision of attacks classification is about $13\%$ higher than in the obtained model.
 
 
 \begin{figure}[h!]
@@ -633,9 +640,9 @@ The baseline model scores better results than the obtained model here. We can ob
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 77.6\% & 22.4\% \\
+     predicted non-attack & 75.40\% & 24.60\% \\
      \hline
-     predicted attack & 60.2\% & 39.8\% \\
+     predicted attack & 51.93\% & 48.07\% \\
      \hline
     \end{tabular}
 
@@ -646,9 +653,9 @@ The baseline model scores better results than the obtained model here. We can ob
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 4655 & 1345 \\
+     predicted non-attack & 4524 & 1476 \\
      \hline
-     predicted attack & 203 & 134 \\
+     predicted attack & 175 & 162 \\
      \hline
     \end{tabular}
     \caption{Confusion matrices with normalized and absolute values of the obtained model for the experiment 4}
@@ -663,9 +670,9 @@ The baseline model scores better results than the obtained model here. We can ob
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 87.5\% & 12.5\% \\
+     predicted non-attack & 88.41\% & 11.58\% \\
      \hline
-     predicted attack & 43.3\% & 56.7\% \\
+     predicted attack & 43.03\% & 56.97\% \\
      \hline
     \end{tabular}
 
@@ -676,9 +683,9 @@ The baseline model scores better results than the obtained model here. We can ob
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 5252 & 748 \\
+     predicted non-attack & 5305 & 695 \\
      \hline
-     predicted attack & 146 & 191 \\
+     predicted attack & 145 & 192 \\
      \hline
     \end{tabular}
     \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 4}
@@ -701,7 +708,7 @@ Out of the whole data set consisted of 276 anomalous flows (attacks) and several
 
 Out of these almost $3.9M$ flows, we sampled $500\ 000$ non-attacks and all 58 attacks. The train set contains $35\ 000$ non-attacks and $40$ attacks. Test set contains $15\ 000$ non-attacks and $18$ attacks.
 
-In this experiment, our obtained model outperformed the baseline model. The difference between precisions for non-attacks is negligible. The difference between precisions is more than $22\%$.
+In this experiment, our obtained model outperformed the baseline model. The difference between precisions for non-attacks is negligible. The difference between precisions is around $16\%$.
 
 
 \begin{figure}[h!]
@@ -741,9 +748,10 @@ In this experiment, our obtained model outperformed the baseline model. The diff
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 99.96\% & 0.04\% \\
+     predicted non-attack & 99.94\% & 0.06\% \\
      \hline
-     predicted attack & 38.89\% & 61.11\% \\
+    %  predicted attack & 38.89\% & 61.11\% \\
+     predicted attack & 38.89\% & 66.67\% \\
      \hline
     \end{tabular}
 
