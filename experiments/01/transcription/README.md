@@ -2,7 +2,7 @@
 
 ## pipeline_cic-ids-2017.sh
 - This script creates sentence-like transcriptions out of the specified CIC-IDS-2017 pcap file.
-- Before running the script, you have to download the CIC-IDS-2017 pcap files 
+- **IMPORTANT:** Before running the script, you have to download the CIC-IDS-2017 pcap files 
 \[https://www.unb.ca/cic/datasets/ids-2017.html].
   - Save these files into `resources/CIC-IDS-2017` folder located in the project root 
     and keep its original names.
@@ -35,5 +35,5 @@
 
 ### Examples
 ```shell
-./pipeline_general.sh ~/data/my-file.pcap
+./pipeline_general.sh ../../../resources/CIC-IDS-2017/Friday-WorkingHours.pcap
 ```
