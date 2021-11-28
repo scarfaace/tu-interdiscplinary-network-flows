@@ -1,8 +1,7 @@
 FROM ubuntu:20.04
 
-COPY experiments ./
-COPY labeling ./
-COPY requirements.txt ./
+WORKDIR /interdisciplinary
+COPY . .
 
 ENV VENV_NAME="venv"
 
@@ -14,3 +13,5 @@ RUN virtualenv $VENV_NAME
 RUN chmod 755 $VENV_NAME/bin/activate && \
     ./$VENV_NAME/bin/activate
 RUN pip install -r requirements.txt
+
+CMD ["bash"]
