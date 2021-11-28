@@ -220,22 +220,10 @@ The output data set containing transcriptions derived from pcap files is a TSV f
 \end{itemize}
 %---------------------------------------------------------------------
 
+\clearpage
 \section{Evaluation}
 
-\subsection{CIC-IDS2017 Data Set Experiments}\label{sec-cic-ids-experiments}
-
-The experiments provided in this section were conducted on top of the CIC-IDS2017 data set described in the section \ref{sec-data-cic-ids-2017}. As the whole data set consists of several sub data sets, we conducted experiments on top of almost each one of these sub data sets.
-
-As Monday data do not have any malicious traffic, we skipped this one. All the data sets from Tuesday to Friday contain both malicious and non-malicious traffic, therefore we conducted an experiment on top of each of them.
-
-From each data set from Tuesday to Friday, we derive two different data sets for training and evaluating two different models. Both of these models are trained for binary classification, meaning deciding between the two classes -- \textit{attack} and \textit{non-attack}.
-
-For both the baseline and non-baseline models we split both attacks and non-attacks in the 70:30 train set to test set ratio. Then we merge non-attacks with attacks for both train and test data separately in order to create a single train set and a single test set.
-
-We didn't necessarily train and test our baseline models on exactly the same train and test network flows as we did for the models on top of transcriptions data. Nevertheless, we subsampled from the same sets of network flows which minimizes the impact of not using the same network flows for training and testing the models. The counts for train and test sets are exactly the same for both models in each day, i.e. if Thursday's baseline model has a train set consisted of $1\ 500$ non-attacks and $100$ attacks and a test set consisted of $700$ non-attacks and $50$ attacks, then the same counts for train and test sets are applied to the Random Forest on top of bag of words model.
-
-The goal for these experiments was to achieve the highest possible accuracy for both the \textit{attack} class and the \textit{non-attack} class. Achieving overall accuracy on top of whole test sets is meaningless for us as our data sets are imbalanced and therefore overall accuracy may distort results.\\
-
+In the following sections, we conducted several experiments on top of different data sets. For each data set we trained and evaluated two types of models -- baseline and obtained model.\\
 
 \noindent\textbf{Baseline Model}
 
@@ -258,7 +246,7 @@ As a baseline model we chose to train Random Forest models. We aggregated severa
     \item \textit{stdev}.
 \end{itemize}
 
-\vspace{0.5cm}
+\vspace{0.4cm}
 
 
 \noindent\textbf{Obtained Model}
@@ -295,6 +283,22 @@ We used a bag of words technique to express our transcription strings as numeric
 \end{figure}
 
 
+\subsection{CIC-IDS2017 Data Set Experiments}\label{sec-cic-ids-experiments}
+
+The experiments provided in this section were conducted on top of the CIC-IDS2017 data set described in the section \ref{sec-data-cic-ids-2017}. As the whole data set consists of several sub data sets, we conducted experiments on top of almost each one of these.
+
+As Monday data do not have any malicious traffic, we skipped this one. All the data sets from Tuesday to Friday contain both malicious and non-malicious traffic, therefore we conducted an experiment on top of each of them.
+
+From each data set from Tuesday to Friday, we derive two different data sets for training and evaluating two different models -- baseline and obtained. Both of these models are trained for binary classification, meaning deciding between the two classes -- \textit{attack} and \textit{non-attack}.
+
+For both the baseline and non-baseline models we split both attacks and non-attacks in the 70:30 train set to test set ratio. Then we merge non-attacks with attacks for both train and test data separately in order to create a single train set and a single test set.
+
+We didn't necessarily train and test our baseline models on exactly the same train and test network flows as we did for the models on top of transcriptions data. Nevertheless, we subsampled from the same sets of network flows which minimizes the impact of not using the same network flows for training and testing the models. The counts for train and test sets are exactly the same for both models in each day, i.e. if Thursday's baseline model has a train set consisted of $1\ 500$ non-attacks and $100$ attacks and a test set consisted of $700$ non-attacks and $50$ attacks, then the same counts for train and test sets are applied to the Random Forest on top of bag of words model.
+
+The goal for these experiments was to achieve the highest possible precision for both the \textit{attack} class and the \textit{non-attack} class. Achieving good accuracy results on top of whole test sets is meaningless for us as our data sets are imbalanced and therefore accuracy may distort results.
+
+
+
 \clearpage
 
 \subsubsection{Friday}
@@ -307,7 +311,18 @@ The baseline model achieves better results here in regards to predicting non-att
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.7\textwidth]{final-report/img/friday/confusion-matrix-normalized.png}
+    % \includegraphics[width=0.7\textwidth]{final-report/img/friday/confusion-matrix-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 92.4\% & 7.6\% \\
+     \hline
+     predicted attack & 8.6\% & 91.4\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
@@ -328,21 +343,60 @@ The baseline model achieves better results here in regards to predicting non-att
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.7\textwidth]{final-report/img/friday/friday-baseline-normalized.png}
+    % \includegraphics[width=0.7\textwidth]{final-report/img/friday/friday-baseline-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 99.2\% & 0.8\% \\
+     \hline
+     predicted attack & 6.9\% & 93.1\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 1635 & 15 \\
+     predicted non-attack & 1636 & 14 \\
      \hline
-     predicted attack & 12 & 46 \\
+     predicted attack & 4 & 54 \\
      \hline
     \end{tabular}
     \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 1}
     \label{fig-exp1-baseline}
 \end{figure}
+% \begin{figure}[h!]
+%     \centering
+%     % \includegraphics[width=0.7\textwidth]{final-report/img/friday/friday-baseline-normalized.png}
+%     \begin{tabular}{ |c|c|c|c|c|c|c| }
+%      \hline
+%       & true non-attack & true attack \\
+%      \hline
+%      predicted non-attack & 100\% & 0.0\% \\
+%      \hline
+%      predicted attack & 8.6\% & 91.4\% \\
+%      \hline
+%     \end{tabular}
+
+%     \vspace{0.2cm}
+
+%     \centering
+%     \begin{tabular}{ |c|c|c|c|c|c|c| }
+%      \hline
+%       & true non-attack & true attack \\
+%      \hline
+%      predicted non-attack & 1498 & 15 \\
+%      \hline
+%      predicted attack & 12 & 46 \\
+%      \hline
+%     \end{tabular}
+%     \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 1}
+%     \label{fig-exp1-baseline}
+% \end{figure}
 
 \clearpage
 
@@ -358,7 +412,18 @@ In this experiment, the baseline model scored was able to score slightly better 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{final-report/img/wednesday/confusion-matrix-normalized.png}
+    % \includegraphics[width=0.75\textwidth]{final-report/img/wednesday/confusion-matrix-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 99.9\% & 0.1\% \\
+     \hline
+     predicted attack & 17.6\% & 82.4\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
@@ -370,23 +435,35 @@ In this experiment, the baseline model scored was able to score slightly better 
      predicted attack & 3 & 14 \\
      \hline
     \end{tabular}
-    \caption{Confusion matrix with absolute values for the experiment 2}
+    \caption{Confusion matrices with normalized and absolute values of the obtained model for the experiment 2}
     \label{fig-exp2-transcriptions}
 \end{figure}
 
 
 % In this case we achieved better results than for the model trained and tested on top of the transcriptions data set. The results are captured in the Figure \ref{fig-exp1-baseline}.
 
+
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.75\textwidth]{final-report/img/wednesday/wednesday-baseline-normalized.png}
+    % \includegraphics[width=0.75\textwidth]{final-report/img/wednesday/wednesday-baseline-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 99.9\% & 0.1\% \\
+     \hline
+     predicted attack & 11.8\% & 88.2\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
      \hline
       & true non-attack & true attack \\
      \hline
-     predicted non-attack & 1649 & 1 \\
+     predicted non-attack & 1499 & 1 \\
      \hline
      predicted attack & 2 & 15 \\
      \hline
@@ -394,6 +471,34 @@ In this experiment, the baseline model scored was able to score slightly better 
     \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 2}
     \label{fig-exp2-baseline}
 \end{figure}
+% \begin{figure}[h]
+%     \centering
+%     % \includegraphics[width=0.75\textwidth]{final-report/img/wednesday/wednesday-baseline-normalized.png}
+%     \begin{tabular}{ |c|c|c|c|c|c|c| }
+%      \hline
+%       & true non-attack & true attack \\
+%      \hline
+%      predicted non-attack & 99.9\% & 0.1\% \\
+%      \hline
+%      predicted attack & 11.8\% & 88.4\% \\
+%      \hline
+%     \end{tabular}
+
+%     \vspace{0.2cm}
+
+%     \centering
+%     \begin{tabular}{ |c|c|c|c|c|c|c| }
+%      \hline
+%       & true non-attack & true attack \\
+%      \hline
+%      predicted non-attack & 1649 & 1 \\
+%      \hline
+%      predicted attack & 2 & 15 \\
+%      \hline
+%     \end{tabular}
+%     \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 2}
+%     \label{fig-exp2-baseline}
+% \end{figure}
 
 
 \clearpage
@@ -408,7 +513,18 @@ By comparing the baseline model results in the Figure \ref{fig-exp3-baseline} to
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{final-report/img/tuesday/confusion-matrix-normalized.png}
+    % \includegraphics[width=0.75\textwidth]{final-report/img/tuesday/confusion-matrix-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 100\% & 0.0\% \\
+     \hline
+     predicted attack & 25.0\% & 75.0\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
@@ -420,14 +536,25 @@ By comparing the baseline model results in the Figure \ref{fig-exp3-baseline} to
      predicted attack & 1 & 3 \\
      \hline
     \end{tabular}
-    \caption{Confusion matrix with absolute values for the experiment 3}
+    \caption{Confusion matrices with normalized and absolute values of the obtained model for the experiment 3}
     \label{fig-exp3-transcriptions}
 \end{figure}
 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{final-report/img/tuesday/tuesday-baseline-normalized.png}
+    % \includegraphics[width=0.75\textwidth]{final-report/img/tuesday/tuesday-baseline-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 100\% & 0.0\% \\
+     \hline
+     predicted attack & 25.0\% & 75.0\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
@@ -458,7 +585,18 @@ The baseline model scores better results than the obtained model here. We can ob
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{final-report/img/thursday/confusion-matrix-normalized.png}
+    % \includegraphics[width=0.75\textwidth]{final-report/img/thursday/confusion-matrix-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 77.6\% & 22.4\% \\
+     \hline
+     predicted attack & 60.2\% & 39.8\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
@@ -470,14 +608,25 @@ The baseline model scores better results than the obtained model here. We can ob
      predicted attack & 203 & 134 \\
      \hline
     \end{tabular}
-    \caption{Confusion matrix with absolute values for the experiment 4}
+    \caption{Confusion matrices with normalized and absolute values of the obtained model for the experiment 4}
     \label{fig-exp4-transcriptions}
 \end{figure}
 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{final-report/img/thursday/baseline-normalized.png}
+    % \includegraphics[width=0.75\textwidth]{final-report/img/thursday/baseline-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 87.5\% & 12.5\% \\
+     \hline
+     predicted attack & 43.3\% & 56.7\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
 
     \centering
     \begin{tabular}{ |c|c|c|c|c|c|c| }
@@ -491,6 +640,84 @@ The baseline model scores better results than the obtained model here. We can ob
     \end{tabular}
     \caption{Confusion matrices with normalized and absolute values of the baseline model for the experiment 4}
     \label{fig-exp4-baseline}
+\end{figure}
+
+
+\clearpage
+
+\subsection{MAWI Data Set Experiments}\label{sec-mawi-experiments}
+
+
+The experiments provided in this section were conducted on top of the MAWI data set described in the section \ref{sec-data-cic-ids-2017}. As the whole data set consists of several sub data sets, we conducted experiments on top of almost each one of these.
+
+The MAWI data set contains a lot of sub data sets. We chose some data sets that contain higher number of attack flows compared to the other sub data sets.
+
+\subsubsection{23rd June 2018, 14:00}
+
+Out of the whole data set consisted of 276 anomalous flows (attacks) and several millions of non-attack flows, we generated only the first $3\ 857\ 573$ flows. This is the maximum number that we were able to generate with our machine. The network flows generation process was too heavy in regards to RAM memory and did not allow us to generate more flows. This way we lost remaining 218 attacks and various other non-attack flows.
+
+Out of these almost $3.9M$ flows, we sampled $500\ 000$ non-attacks and all 58 attacks. The train set contains $35\ 000$ non-attacks and $40$ attacks. Test set contains $15\ 000$ non-attacks and $18$ attacks.
+
+In this experiment, our obtained model outperformed the baseline model. The difference between precisions for non-attacks is negligible. The difference between precisions is more than $22\%$.
+
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.75\textwidth]{final-report/img/thursday/confusion-matrix-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 99.95\% & 0.05\% \\
+     \hline
+     predicted attack & 16.67\% & 83.33\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
+
+    \centering
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 14992 & 8 \\
+     \hline
+     predicted attack & 3 & 15 \\
+     \hline
+    \end{tabular}
+    \caption{Confusion matrices with normalized and absolute values of the obtained model for the MAWI experiment 1}
+    \label{fig-mawi-exp1-transcriptions}
+\end{figure}
+
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.75\textwidth]{final-report/img/thursday/baseline-normalized.png}
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 99.96\% & 0.04\% \\
+     \hline
+     predicted attack & 38.89\% & 61.11\% \\
+     \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
+
+    \centering
+    \begin{tabular}{ |c|c|c|c|c|c|c| }
+     \hline
+      & true non-attack & true attack \\
+     \hline
+     predicted non-attack & 14991 & 9 \\
+     \hline
+     predicted attack & 6 & 12 \\
+     \hline
+    \end{tabular}
+    \caption{Confusion matrices with normalized and absolute values of the baseline model for the MAWI experiment 1}
+    \label{fig-mawi-exp1-baseline}
 \end{figure}
 
 
