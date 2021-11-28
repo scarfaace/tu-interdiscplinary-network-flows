@@ -33,7 +33,15 @@ pcap2transcription \cite{pcap2transcription} is a preliminary project that tries
 
 \section{Methodology}
 \subsection{Data}\label{sec-data-cic-ids-2017}
-For the purpose of our experiments we used the synthetic CIC IDS 2017 data set \cite{sharafaldin2018toward}. The data set contains pcap files and labels of the network flows. The labels are binary -- attack and non-attack.
+For the purpose of our experiments we worked with two data sets:
+
+\begin{itemize}
+    \item CIC-IDS 2017 \cite{sharafaldin2018toward},
+    \item MAWI \cite{mawilab}.
+\end{itemize}
+
+\subsubsection{CIC-IDS 2017}
+First data set that we used is the synthetic CIC IDS 2017 data set \cite{sharafaldin2018toward}. The data set contains pcap files and labels of the network flows. The labels are binary -- attack and non-attack.
 
 There are 5 different pcap files in this data set. Each of them represents a different day in the week from Monday to Friday. The size of all of them vary from 7GB up to 14GB.
 
@@ -62,7 +70,42 @@ Table \ref{tab:cic-ids2017-data-description} describes the data sets contained i
 The official page of CIC IDS 2017 data\footnote{\url{https://www.unb.ca/cic/datasets/ids-2017.html}} guides you on how to do the data labeling of all days contained in the data set. However, we were provided with a labeling script by Félix Iglesias Vázquez and Fares Meghdouri which we highly appreciate. We double-checked the rules for labeling in the script and approved it for our use.
 
 
-% describe how many packets do the files contain
+\subsubsection{MAWI}
+Another data that we used in our experiments is the MAWI data set. This data consists of several sub data sets -- days of different months and years. All of these are packet captures (pcap files), so they are perfectly suitable to our data processing process.
+
+Table \ref{tab:mawi-data-description} describes the MAWI data that we used in our project in terms of number of network flows and number of attacks. Since we experienced insufficient RAM problems during feature extraction from this data, we could not construct all flows contained in this data. That's why \verb|# network flows| column shows the minimal number of flows contained. The \verb|# attacks| column captures only the number of attacks contained in the number of flows indicated in the \verb|# network flows column|.
+
+\begin{table}[h!]
+\centering
+    \begin{tabular}{ |c|c|c|c| }
+        \hline
+        Date & \# network flows & \# attacks \\
+        \hline
+        2018-06-23 & $>3\ 857\ 573$ & 58 \\
+        \hline
+    \end{tabular}
+\caption{MAWI data description table}
+\label{tab:mawi-data-description}
+\end{table}
+
+
+
+\noindent\textbf{Labeling}
+
+In short, there are 4 different classes of network flows:
+
+\begin{itemize}
+    \item anomalous,
+    \item suspicious
+    \item notice,
+    \item benign.
+\end{itemize}
+MAWI webpage documents how the data set labeling exactly works \cite{mawilab-documentation-labeling}. Each of these classes gets assigned based on certain technique.
+
+Every specific data day contains its own labels in a CSV file. Every such CSV file contains an entry per attack communication. Each entry contains a source IP address and a destination IP address. From the data web page, it is not clear how to correctly label the data. From an e-mail communication with the authors, we found out that in order to label network flows of a certain date, we have to simply assign an \textit{attack} label to every flow whose source IP and destination IP address pair is contained in a CSV file of labels.
+
+
+
 
 %-------------------------------------------------------
 \subsection{Data Exploration}\label{sec-dataset-exploration}
@@ -652,7 +695,7 @@ The experiments provided in this section were conducted on top of the MAWI data 
 
 The MAWI data set contains a lot of sub data sets. We chose some data sets that contain higher number of attack flows compared to the other sub data sets.
 
-\subsubsection{23rd June 2018, 14:00}
+\subsubsection{23rd June 2018}
 
 Out of the whole data set consisted of 276 anomalous flows (attacks) and several millions of non-attack flows, we generated only the first $3\ 857\ 573$ flows. This is the maximum number that we were able to generate with our machine. The network flows generation process was too heavy in regards to RAM memory and did not allow us to generate more flows. This way we lost remaining 218 attacks and various other non-attack flows.
 
@@ -725,9 +768,11 @@ In this experiment, our obtained model outperformed the baseline model. The diff
 
 \clearpage
 \section{Conclusions}
-In all experiments baseline models scored better results than the obtained models except of one experiment where they both achieved the very same results. However, in most cases the baseline models performed just slightly better than the obtained models. This means that the very first outcomes in regards to the transcriptions data set look promising.
+In all experiments on top of CIC-IDS 2017 data, the baseline models scored better results than the obtained models except of one experiment where they both achieved the very same results. However, in most cases the baseline models performed just slightly better than the obtained models. This means that the very first outcomes in regards to the transcriptions data set look promising.
 
-One potential reason why our obtained models did not succeed in scoring better results than the baseline models is lack of train data. The transformation of transcription data sets into bag of words data set was failing on bigger data sets due to insufficient RAM. This is the reason why we subsampled only certain amount of non-attack samples for each experiment. Using more samples to be transformed into bag of words was crashing our scripts.
+We provided only 1 experiment on top of MAWI data, concretely on top of the 23rd June 2018 data set. Here, the obtained model scored overall better results than the baseline model. Particularly, a huge difference (more than $22\%$) is in precision of attacks classification.
+
+One potential reason why our obtained models mostly did not succeed in scoring better results than the baseline models is lack of train data and particularly attacks data. The transformation of transcription data sets into bag of words data set was failing on bigger data sets due to insufficient RAM. This is the reason why we subsampled only certain amount of non-attack samples for each experiment. Using more samples to be transformed into bag of words was crashing our scripts.
 
 Next potential improvement may be choosing a different model instead of Random Forest on top of bag of words and evaluating its results. Using a simple bag of words may be too naive method. Researching and using a different kind of technique may score better results.
 
