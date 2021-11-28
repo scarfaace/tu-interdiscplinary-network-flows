@@ -18,9 +18,9 @@
 \section*{Abstract}
 The goal of this work was to design a suitable schema that transforms TCP/IP flows into sentence-like transcriptions and implement a software in Python that does such transformation from \textit{pcap} files and to evaluate its suitability for attack detection.
 
-The schema that we implemented uses printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) which makes 93 characters altogether. Our schema utilizes three network flow features to express the final transcription -- packet length, flow direction and inter packet times. With a specific configuration that we used for these four features, we were able to to convert huge pcap files (approximately 10GB) into few kB big files containing the sentence-like transcriptions of the network flows contained in those pcap files.
+The schema that we implemented uses printable ASCII characters in the range from the exclamation mark character (\textit{!}) up to the tilde character (\textit{$\sim$}) which makes 93 characters altogether. Our schema utilizes three network flow features to express the final transcription -- \textit{packet length}, \textit{flow direction} and \textit{inter packet times}. With a specific configuration that we used for these four features, we were able to convert huge pcap files (approximately 10GB) into few kB big files containing the sentence-like transcriptions of the network flows from those pcap files.
 
-At the same time we were able to produce quite decent results for a binary classification problem distinguishing between attack and non-attack flows. For this purpose we used Random Forest Classifier on top of a basic bag of words data set constructed from the sentence-like transcriptions.
+At the same time we were able to produce quite decent results for a binary classification problem distinguishing between attack and non-attack flows. For this purpose we used Random Forest Classifier on top of a basic bag of words data set constructed from the sentence-like transcriptions comparing it to performances of baseline models.
 
 \newpage
 \tableofcontents
@@ -32,7 +32,7 @@ pcap2transcription \cite{pcap2transcription} is a preliminary project that tries
 
 
 \section{Methodology}
-\subsection{Data}\label{sec-data-cic-ids-2017}
+\subsection{Data}\label{sec-methodology-data}
 For the purpose of our experiments we worked with two data sets:
 
 \begin{itemize}
@@ -64,7 +64,7 @@ Table \ref{tab:cic-ids2017-data-description} describes the data sets contained i
 \label{tab:cic-ids2017-data-description}
 \end{table}
 
-
+\clearpage
 \noindent\textbf{Labeling}
 
 The official page of CIC IDS 2017 data\footnote{\url{https://www.unb.ca/cic/datasets/ids-2017.html}} guides you on how to do the data labeling of all days contained in the data set. However, we were provided with a labeling script by Félix Iglesias Vázquez and Fares Meghdouri which we highly appreciate. We double-checked the rules for labeling in the script and approved it for our use.
@@ -92,7 +92,7 @@ Table \ref{tab:mawi-data-description} describes the MAWI data that we used in ou
 
 \noindent\textbf{Labeling}
 
-In short, there are 4 different classes of network flows:
+In short, there are 4 different classes of network flows in the MAWI data:
 
 \begin{itemize}
     \item anomalous,
@@ -328,7 +328,7 @@ We used a bag of words technique to express our transcription strings as numeric
 
 \subsection{CIC-IDS2017 Data Set Experiments}\label{sec-cic-ids-experiments}
 
-The experiments provided in this section were conducted on top of the CIC-IDS2017 data set described in the section \ref{sec-data-cic-ids-2017}. As the whole data set consists of several sub data sets, we conducted experiments on top of almost each one of these.
+The experiments provided in this section were conducted on top of the CIC-IDS2017 data set described in the section \ref{sec-methodology-data}. As the whole data set consists of several sub data sets, we conducted experiments on top of almost each one of these.
 
 As Monday data do not have any malicious traffic, we skipped this one. All the data sets from Tuesday to Friday contain both malicious and non-malicious traffic, therefore we conducted an experiment on top of each of them.
 
@@ -691,7 +691,7 @@ The baseline model scores better results than the obtained model here. We can ob
 \subsection{MAWI Data Set Experiments}\label{sec-mawi-experiments}
 
 
-The experiments provided in this section were conducted on top of the MAWI data set described in the section \ref{sec-data-cic-ids-2017}. As the whole data set consists of several sub data sets, we conducted experiments on top of almost each one of these.
+The experiments provided in this section were conducted on top of the MAWI data set described in the section \ref{sec-methodology-data}. As the whole data set consists of several sub data sets, we conducted experiments on top of almost each one of these.
 
 The MAWI data set contains a lot of sub data sets. We chose some data sets that contain higher number of attack flows compared to the other sub data sets.
 
