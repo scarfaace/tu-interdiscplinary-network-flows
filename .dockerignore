@@ -1,0 +1,6 @@
+report
+resources
+venv
+wiki
+.git
+.gitignore
