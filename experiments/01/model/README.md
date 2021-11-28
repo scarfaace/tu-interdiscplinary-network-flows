@@ -1,11 +1,21 @@
 ## Directories
 
 ```
-├── cic-ids-2017 - contains files related to the experiment on top of CIC IDS 2017 data
-├── mawi - contains files related to the experiment on top of MAWI data
 ├── baseline_binary.py - python script for training and evaluation of baseline binary classification model
+├── cic-ids-2017 - contains files related to the experiment on top of CIC IDS 2017 data
+│   ├── baseline
+│   │   ├── data - data for baseline mode
+│   │   └── feature-extraction - files related to feature extraction for baseline model
+│   └── obtained
+│       └── data - data for obtained model
+├── mawi
+│   ├── baseline
+│   │   └── data - data for baseline mode
+│   └── obtained
+│       └── data - data for obtained model
 └── obtained_binary.py - python script for training and evaluation of obtained (on top of transcription data) binary classification model
 ```
+
 
 ## Obtaining results for baseline models
 
